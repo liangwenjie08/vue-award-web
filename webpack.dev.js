@@ -22,5 +22,38 @@ module.exports = merge(common, {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin()
-  ]
+  ],
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: [
+        {
+          loader: "vue-style-loader",
+          options: {
+            sourceMap: false,
+            shadowMode: false
+          }
+        },
+        {
+          loader: "css-loader",
+          options: {
+            sourceMap: false,
+            importLoaders: 2
+          }
+        },
+        {
+          loader: "postcss-loader",
+          options: {
+            sourceMap: false
+          }
+        },
+        {
+          loader: "less-loader",
+          options: {
+            sourceMap: false
+          }
+        }
+      ]
+    }]
+  }
 });

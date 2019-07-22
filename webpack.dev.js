@@ -14,6 +14,7 @@ module.exports = merge(common, {
     host: "localhost",
     stats: "errors-only",
     open: true,
+    quiet: true,
     overlay: true
   },
   output: {

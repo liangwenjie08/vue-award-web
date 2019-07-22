@@ -2,6 +2,9 @@ const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const CaseSensitivePathsWebpackPlugin = require("case-sensitive-paths-webpack-plugin");
+const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 
 module.exports = {
   context: path.resolve(__dirname),
@@ -17,11 +20,29 @@ module.exports = {
     child_process: "empty"
   },
   plugins: [
+    new VueLoaderPlugin(),
+    new CaseSensitivePathsWebpackPlugin(),
+    new FriendlyErrorsWebpackPlugin(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./public/index.html"
     }),
-    new VueLoaderPlugin()
+    new PreloadWebpackPlugin(
+      {
+        rel: "preload",
+        include: "initial",
+        fileBlacklist: [
+          /\.map$/,
+          /hot-update\.js$/
+        ]
+      }
+    ),
+    new PreloadWebpackPlugin(
+      {
+        rel: "prefetch",
+        include: "asyncChunks"
+      }
+    ),
   ],
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -29,7 +50,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "@": "D:\\study\\vue-test\\src",
+      "@": path.resolve(__dirname, "src"),
       vue$: "vue/dist/vue.runtime.esm.js"
     },
     extensions: [
@@ -68,7 +89,6 @@ module.exports = {
     }, {
       test: /\.(png|jpe?g|gif|webp)(\?.*)?$/,
       use: [
-        /* config.module.rule('images').use('url-loader') */
         {
           loader: "url-loader",
           options: {
@@ -85,7 +105,6 @@ module.exports = {
     }, {
       test: /\.(svg)(\?.*)?$/,
       use: [
-        /* config.module.rule('svg').use('file-loader') */
         {
           loader: "file-loader",
           options: {

@@ -1,10 +1,8 @@
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const CaseSensitivePathsWebpackPlugin = require("case-sensitive-paths-webpack-plugin");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
-const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 
 module.exports = {
   context: path.resolve(__dirname),
@@ -23,22 +21,7 @@ module.exports = {
     new VueLoaderPlugin(),
     new CaseSensitivePathsWebpackPlugin(),
     new FriendlyErrorsWebpackPlugin(),
-    new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      template: "./public/index.html"
-    }),
-    new PreloadWebpackPlugin({
-      rel: "preload",
-      include: "initial",
-      fileBlacklist: [
-        /\.map$/,
-        /hot-update\.js$/
-      ]
-    }),
-    new PreloadWebpackPlugin({
-      rel: "prefetch",
-      include: "asyncChunks"
-    }),
+    new CleanWebpackPlugin()
   ],
   output: {
     path: path.resolve(__dirname, "dist"),

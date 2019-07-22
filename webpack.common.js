@@ -27,22 +27,18 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./public/index.html"
     }),
-    new PreloadWebpackPlugin(
-      {
-        rel: "preload",
-        include: "initial",
-        fileBlacklist: [
-          /\.map$/,
-          /hot-update\.js$/
-        ]
-      }
-    ),
-    new PreloadWebpackPlugin(
-      {
-        rel: "prefetch",
-        include: "asyncChunks"
-      }
-    ),
+    new PreloadWebpackPlugin({
+      rel: "preload",
+      include: "initial",
+      fileBlacklist: [
+        /\.map$/,
+        /hot-update\.js$/
+      ]
+    }),
+    new PreloadWebpackPlugin({
+      rel: "prefetch",
+      include: "asyncChunks"
+    }),
   ],
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -88,6 +84,20 @@ module.exports = {
       }]
     }, {
       test: /\.(png|jpe?g|gif|webp)(\?.*)?$/,
+      use: [{
+        loader: "url-loader",
+        options: {
+          limit: 4096,
+          fallback: {
+            loader: "file-loader",
+            options: {
+              name: "img/[name].[hash:8].[ext]"
+            }
+          }
+        }
+      }]
+    }, {
+      test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
       use: [
         {
           loader: "url-loader",
@@ -96,7 +106,7 @@ module.exports = {
             fallback: {
               loader: "file-loader",
               options: {
-                name: "img/[name].[hash:8].[ext]"
+                name: "fonts/[name].[hash:8].[ext]"
               }
             }
           }
@@ -104,14 +114,12 @@ module.exports = {
       ]
     }, {
       test: /\.(svg)(\?.*)?$/,
-      use: [
-        {
-          loader: "file-loader",
-          options: {
-            name: "img/[name].[hash:8].[ext]"
-          }
+      use: [{
+        loader: "file-loader",
+        options: {
+          name: "img/[name].[hash:8].[ext]"
         }
-      ]
+      }]
     }]
   }
 };

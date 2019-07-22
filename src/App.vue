@@ -1,15 +1,21 @@
 <template>
-  <div>
-    <h1>vue-award-web</h1>
+  <div id="root">
+    <router-view/>
   </div>
 </template>
 
-<script>
-  export default {
-    name: "App"
-  };
-</script>
+<style lang="less">
+  body,
+  html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-<style scoped>
-
+  #root {
+    display: flex;
+    height: 100%;
+    width: 100%;
+  }
 </style>

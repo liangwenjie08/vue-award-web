@@ -26,32 +26,169 @@ module.exports = merge(common, {
   ],
   module: {
     rules: [{
+      test: /\.less$/,
+      oneOf: [
+        {
+          resourceQuery: /module/,
+          use: [
+            /* config.module.rule('less').oneOf('vue-modules').use('vue-style-loader') */
+            {
+              loader: "vue-style-loader",
+              options: {
+                sourceMap: false,
+                shadowMode: false
+              }
+            },
+            /* config.module.rule('less').oneOf('vue-modules').use('css-loader') */
+            {
+              loader: "css-loader",
+              options: {
+                sourceMap: false,
+                importLoaders: 2,
+                modules: true,
+                localIdentName: "[name]_[local]_[hash:base64:5]"
+              }
+            },
+            /* config.module.rule('less').oneOf('vue-modules').use('postcss-loader') */
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: false
+              }
+            },
+            /* config.module.rule('less').oneOf('vue-modules').use('less-loader') */
+            {
+              loader: "less-loader",
+              options: {
+                sourceMap: false
+              }
+            }
+          ]
+        }, {
+          resourceQuery: /\?vue/,
+          use: [
+            /* config.module.rule('less').oneOf('vue').use('vue-style-loader') */
+            {
+              loader: "vue-style-loader",
+              options: {
+                sourceMap: false,
+                shadowMode: false
+              }
+            },
+            /* config.module.rule('less').oneOf('vue').use('css-loader') */
+            {
+              loader: "css-loader",
+              options: {
+                sourceMap: false,
+                importLoaders: 2
+              }
+            },
+            /* config.module.rule('less').oneOf('vue').use('postcss-loader') */
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: false
+              }
+            },
+            /* config.module.rule('less').oneOf('vue').use('less-loader') */
+            {
+              loader: "less-loader",
+              options: {
+                sourceMap: false
+              }
+            }
+          ]
+        }, {
+          test: /\.module\.\w+$/,
+          use: [
+            /* config.module.rule('less').oneOf('normal-modules').use('vue-style-loader') */
+            {
+              loader: "vue-style-loader",
+              options: {
+                sourceMap: false,
+                shadowMode: false
+              }
+            },
+            /* config.module.rule('less').oneOf('normal-modules').use('css-loader') */
+            {
+              loader: "css-loader",
+              options: {
+                sourceMap: false,
+                importLoaders: 2,
+                modules: true,
+                localIdentName: "[name]_[local]_[hash:base64:5]"
+              }
+            },
+            /* config.module.rule('less').oneOf('normal-modules').use('postcss-loader') */
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: false
+              }
+            },
+            /* config.module.rule('less').oneOf('normal-modules').use('less-loader') */
+            {
+              loader: "less-loader",
+              options: {
+                sourceMap: false
+              }
+            }
+          ]
+        }, {
+          use: [
+            /* config.module.rule('less').oneOf('normal').use('vue-style-loader') */
+            {
+              loader: "vue-style-loader",
+              options: {
+                sourceMap: false,
+                shadowMode: false
+              }
+            },
+            /* config.module.rule('less').oneOf('normal').use('css-loader') */
+            {
+              loader: "css-loader",
+              options: {
+                sourceMap: false,
+                importLoaders: 2
+              }
+            },
+            /* config.module.rule('less').oneOf('normal').use('postcss-loader') */
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: false
+              }
+            },
+            /* config.module.rule('less').oneOf('normal').use('less-loader') */
+            {
+              loader: "less-loader",
+              options: {
+                sourceMap: false
+              }
+            }
+          ]
+        }
+      ]
+    }, {
       test: /\.css$/,
       use: [
+        "vue-style-loader",
+        "css-loader"
+      ]
+    }, {
+      test: /\.js$/,
+      use: [
         {
-          loader: "vue-style-loader",
+          loader: "cache-loader",
           options: {
-            sourceMap: false,
-            shadowMode: false
+            cacheDirectory: path.resolve(__dirname, "node_modules/.cache/babel-loader")
+            // cacheIdentifier: "22a018e2"
           }
         },
         {
-          loader: "css-loader",
+          loader: "babel-loader",
           options: {
-            sourceMap: false,
-            importLoaders: 2
-          }
-        },
-        {
-          loader: "postcss-loader",
-          options: {
-            sourceMap: false
-          }
-        },
-        {
-          loader: "less-loader",
-          options: {
-            sourceMap: false
+            presets: ["@babel/preset-env"]
           }
         }
       ]

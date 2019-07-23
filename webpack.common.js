@@ -19,8 +19,11 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
+    //此Webpack插件强制所有必需模块的完整路径与磁盘上实际路径的确切大小写相匹配。
     new CaseSensitivePathsWebpackPlugin(),
+    //更友好的进行错误提示
     new FriendlyErrorsWebpackPlugin(),
+    //清除上次打包的dist目录
     new CleanWebpackPlugin()
   ],
   output: {
@@ -32,6 +35,7 @@ module.exports = {
       "@": path.resolve(__dirname, "src"),
       vue$: "vue/dist/vue.runtime.esm.js"
     },
+    //可以省略后缀的文件
     extensions: [
       ".js",
       ".vue"

@@ -1,11 +1,15 @@
 const path = require("path");
+//合并webpack配置
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
+//将css分离到单个文件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 const webpack = require("webpack");
-// const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+//压缩 css
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
@@ -17,151 +21,52 @@ module.exports = merge(common, {
     rules: [
       {
         test: /\.less$/,
-        oneOf: [
+        use: [
           {
-            resourceQuery: /module/,
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                  hmr: false,
-                  publicPath: "../"
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2,
-                  modules: true,
-                  localIdentName: "[name]_[local]_[hash:base64:5]"
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: false,
+              publicPath: "../"
+            }
           },
           {
-            resourceQuery: /\?vue/,
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                  hmr: false,
-                  publicPath: "../"
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "css-loader",
+            options: {
+              sourceMap: false,
+              importLoaders: 2
+            }
           },
           {
-            test: /\.module\.\w+$/,
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                  hmr: false,
-                  publicPath: "../"
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2,
-                  modules: true,
-                  localIdentName: "[name]_[local]_[hash:base64:5]"
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "postcss-loader",
+            options: {
+              sourceMap: false
+            }
           },
           {
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                  hmr: false,
-                  publicPath: "../"
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "less-loader",
+            options: {
+              sourceMap: false
+            }
           }
         ]
       },
       {
         test: /\.css$/,
         use: [
-          "vue-style-loader",
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: false,
+              publicPath: "../"
+            }
+          },
           "css-loader"
         ]
       },
       {
         test: /\.js$/,
-        // exclude: [
-        //   function() {
-        //   }
-        // ],
+        exclude: [path.resolve(__dirname, "node_modules")],
         use: [
-          /* config.module.rule('js').use('cache-loader') */
           {
             loader: "cache-loader",
             options: {
@@ -169,11 +74,9 @@ module.exports = merge(common, {
               // cacheIdentifier: "25925c15"
             }
           },
-          /* config.module.rule('js').use('thread-loader') */
           {
             loader: "thread-loader"
           },
-          /* config.module.rule('js').use('babel-loader') */
           {
             loader: "babel-loader"
           }
@@ -202,7 +105,6 @@ module.exports = merge(common, {
         ]
       }
     ),
-    /* config.plugin('prefetch') */
     new PreloadWebpackPlugin(
       {
         rel: "prefetch",
@@ -221,82 +123,40 @@ module.exports = merge(common, {
         hashDigest: "hex"
       }
     )
-    // new OptimizeCssAssetsPlugin({
-    //   assetNameRegExp: /\.optimize\.css$/g,
-    //   cssProcessor: require('cssnano'),
-    //   cssProcessorPluginOptions: {
-    //     preset: ['default', { discardComments: { removeAll: true } }],
-    //   },
-    //   canPrint: true
-    // })
-  ]
-  // optimization: {
-  //   minimizer: [
-  //     {
-  //       options: {
-  //         test: /\.m?js(\?.*)?$/i,
-  //         chunkFilter: () => true,
-  //         warningsFilter: () => true,
-  //         extractComments: false,
-  //         sourceMap: true,
-  //         cache: true,
-  //         cacheKeys: defaultCacheKeys => defaultCacheKeys,
-  //         parallel: true,
-  //         include: undefined,
-  //         exclude: undefined,
-  //         minify: undefined,
-  //         terserOptions: {
-  //           output: {
-  //             comments: /^\**!|@preserve|@license|@cc_on/i
-  //           },
-  //           compress: {
-  //             arrows: false,
-  //             collapse_vars: false,
-  //             comparisons: false,
-  //             computed_props: false,
-  //             hoist_funs: false,
-  //             hoist_props: false,
-  //             hoist_vars: false,
-  //             inline: false,
-  //             loops: false,
-  //             negate_iife: false,
-  //             properties: false,
-  //             reduce_funcs: false,
-  //             reduce_vars: false,
-  //             switches: false,
-  //             toplevel: false,
-  //             typeofs: false,
-  //             booleans: true,
-  //             if_return: true,
-  //             sequences: true,
-  //             unused: true,
-  //             conditionals: true,
-  //             dead_code: true,
-  //             evaluate: true
-  //           },
-  //           mangle: {
-  //             safari10: true
-  //           }
-  //         }
-  //       }
-  //     }
-  //   ],
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       vendors: {
-  //         name: "chunk-vendors",
-  //         test: /[\\\/]node_modules[\\\/]/,
-  //         priority: - 10,
-  //         chunks: "initial"
-  //       },
-  //       common: {
-  //         name: "chunk-common",
-  //         minChunks: 2,
-  //         priority: - 20,
-  //         chunks: "initial",
-  //         reuseExistingChunk: true
-  //       }
-  //     }
-  //   }
-  // }
+  ],
+  optimization: {
+    //OptimizeCssAssetsPlugin 压缩 css
+    minimize: true,
+    minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
+    //分离mainfest
+    runtimeChunk: true,
+    //当发生错误时，不生成dist目录
+    noEmitOnErrors: true,
+    moduleIds: "hashed",
+    chunkIds: "named",
+    nodeEnv: "production",
+    //分离异步加载的代码块
+    splitChunks: {
+      chunks: "async",
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: "~",
+      automaticNameMaxLength: 30,
+      name: true,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
 });

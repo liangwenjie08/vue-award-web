@@ -1,6 +1,6 @@
 <template>
-  <div id="root">
-    <router-view/>
+  <div id="app">
+    <router-view />
   </div>
 </template>
 
@@ -13,7 +13,7 @@
     padding: 0;
   }
 
-  #root {
+  #app {
     display: flex;
     height: 100%;
     width: 100%;

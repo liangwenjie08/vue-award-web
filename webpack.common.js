@@ -25,7 +25,7 @@ module.exports = {
   ],
   output: {
     path: path.resolve(__dirname, "dist"),
-    publicPath: "/"
+    publicPath: "./"
   },
   resolve: {
     alias: {

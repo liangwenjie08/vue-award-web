@@ -20,6 +20,8 @@ module.exports = merge(common, {
     overlay: true
   },
   output: {
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "/",
     filename: "[name].js",
     globalObject: "(typeof self !== 'undefined' ? self : this)"
   },
@@ -39,140 +41,38 @@ module.exports = merge(common, {
       rel: "prefetch",
       include: "asyncChunks"
     }),
-    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin()
   ],
   module: {
     rules: [
       {
         test: /\.less$/,
-        oneOf: [
+        use: [
           {
-            resourceQuery: /module/,
-            use: [
-              {
-                loader: "vue-style-loader",
-                options: {
-                  sourceMap: false,
-                  shadowMode: false
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2,
-                  modules: true,
-                  localIdentName: "[name]_[local]_[hash:base64:5]"
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "vue-style-loader",
+            // options: {
+            //   sourceMap: false,
+            //   shadowMode: false
+            // }
           },
           {
-            resourceQuery: /\?vue/,
-            use: [
-              {
-                loader: "vue-style-loader",
-                options: {
-                  sourceMap: false,
-                  shadowMode: false
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "css-loader",
+            // options: {
+            //   sourceMap: false,
+            //   importLoaders: 2
+            // }
           },
           {
-            test: /\.module\.\w+$/,
-            use: [
-              {
-                loader: "vue-style-loader",
-                options: {
-                  sourceMap: false,
-                  shadowMode: false
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2,
-                  modules: true,
-                  localIdentName: "[name]_[local]_[hash:base64:5]"
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "postcss-loader",
+            // options: {
+            //   sourceMap: false
+            // }
           },
           {
-            use: [
-              {
-                loader: "vue-style-loader",
-                options: {
-                  sourceMap: false,
-                  shadowMode: false
-                }
-              },
-              {
-                loader: "css-loader",
-                options: {
-                  sourceMap: false,
-                  importLoaders: 2
-                }
-              },
-              {
-                loader: "postcss-loader",
-                options: {
-                  sourceMap: false
-                }
-              },
-              {
-                loader: "less-loader",
-                options: {
-                  sourceMap: false
-                }
-              }
-            ]
+            loader: "less-loader",
+            // options: {
+            //   sourceMap: false
+            // }
           }
         ]
       },

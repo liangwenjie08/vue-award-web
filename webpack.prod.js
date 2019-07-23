@@ -9,11 +9,14 @@ const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 const webpack = require("webpack");
 //压缩 css
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+//压缩js
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
   output: {
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "./",
     filename: "js/[name].[contenthash:8].js",
     chunkFilename: "js/[name].[contenthash:8].js"
   },

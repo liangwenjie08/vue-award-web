@@ -7,7 +7,7 @@ const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 module.exports = {
   context: path.resolve(__dirname),
   entry: {
-    main: "./src/main.js"
+    main: path.resolve(__dirname, "src/main.js")
   },
   node: {
     setImmediate: false,
@@ -26,10 +26,6 @@ module.exports = {
     //清除上次打包的dist目录
     new CleanWebpackPlugin()
   ],
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    publicPath: "./"
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

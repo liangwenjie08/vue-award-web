@@ -11,8 +11,11 @@ const webpack = require("webpack");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 //压缩js
 const TerserPlugin = require("terser-webpack-plugin");
+//将runtime内联到index.html中
+const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
 
 module.exports = merge(common, {
+  devtool: "source-map",
   mode: "production",
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -98,6 +101,12 @@ module.exports = merge(common, {
       },
       template: "./public/index.html"
     }),
+    // 注意一定要在HtmlWebpackPlugin之后引用
+    // inline 的name 和你 runtimeChunk 的 name保持一致
+    new ScriptExtHtmlWebpackPlugin({
+      //`runtime` must same as runtimeChunk name. default is `runtime`
+      inline: /runtime.*\..*(\.js)$/
+    }),
     new PreloadWebpackPlugin(
       {
         rel: "preload",
@@ -140,7 +149,7 @@ module.exports = merge(common, {
     nodeEnv: "production",
     //分离异步加载的代码块
     splitChunks: {
-      chunks: "async",
+      chunks: "all",
       minSize: 30000,
       maxSize: 0,
       minChunks: 1,
@@ -150,6 +159,24 @@ module.exports = merge(common, {
       automaticNameMaxLength: 30,
       name: true,
       cacheGroups: {
+        libs: {
+          name: "chunk-libs",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10,
+          chunks: "initial" // 只打包初始时依赖的第三方
+        },
+        elementUI: {
+          name: "chunk-elementUI", // 单独将 elementUI 拆包
+          priority: 20, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
+          test: /[\\/]node_modules[\\/]element-ui[\\/]/
+        },
+        commons: {
+          name: "chunk-commons",
+          test: path.resolve(__dirname, "src/components"), // 可自定义拓展你的规则
+          minChunks: 2, // 最小共用次数
+          priority: 5,
+          reuseExistingChunk: true
+        },
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10

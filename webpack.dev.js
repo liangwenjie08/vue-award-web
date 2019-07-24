@@ -17,7 +17,9 @@ module.exports = merge(common, {
     stats: "errors-only",
     open: true,
     quiet: true,
-    overlay: true
+    overlay: true,
+    writeToDisk: false,
+    filename: "[name].js"
   },
   output: {
     path: path.resolve(__dirname, "dist"),

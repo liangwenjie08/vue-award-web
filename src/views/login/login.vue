@@ -32,7 +32,9 @@
     },
     methods: {
       login() {
-        console.log(this.username, this.password);
+        if (this.username === "admin" && this.password === "admin") {
+          this.$router.replace("/home");
+        }
       }
     }
   };

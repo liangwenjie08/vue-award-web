@@ -15,6 +15,10 @@ const routers = new Router({
     {
       path: "/login",
       component: () => import("@/views/login/login.vue")
+    },
+    {
+      path: "/home",
+      component: () => import("@/views/home/home.vue")
     }
   ]
 });

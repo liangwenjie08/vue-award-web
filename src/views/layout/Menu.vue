@@ -23,6 +23,9 @@
       menuList: {
         require: true
       }
+    },
+    created() {
+
     }
   };
 </script>

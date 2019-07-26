@@ -1,5 +1,8 @@
 <template>
   <Layout>
+    <template v-slot:header>
+      <layout-header />
+    </template>
     <template v-slot:nav>
       <tree-menu :menuList="menuList" />
     </template>
@@ -8,13 +11,15 @@
 
 <script>
   import Layout from "@/views/layout/Layout";
-  import Menu from "@/views/layout/components/Menu";
+  import Menu from "@/views/layout/Menu";
+  import Header from "@/views/layout/Header"
 
   export default {
     name: "home",
     components: {
       Layout,
-      "tree-menu": Menu
+      "tree-menu": Menu,
+      "layout-header": Header
     },
     data() {
       return {

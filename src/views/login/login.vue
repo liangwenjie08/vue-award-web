@@ -22,6 +22,8 @@
 </template>
 
 <script>
+  import { LOGIN } from "@/api/loginAPI";
+
   export default {
     name: "login",
     data: function() {
@@ -31,9 +33,29 @@
       };
     },
     methods: {
-      login() {
-        if (this.username === "admin" && this.password === "admin") {
-          this.$router.replace("/home");
+      async login() {
+        if(this.username.length !== 0 && this.password.length !== 0) {
+          let formDate = new FormData();
+          formDate.append("grant_type", "password");
+          formDate.append("username", this.username);
+          formDate.append("password", this.password);
+          try {
+            const response = await this.$axios.request({
+              url: LOGIN,
+              method: this.$axios.method.POST,
+              headers: {
+                // "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic c2VjdXJpdHktc2VydmljZToxMjM0NTY="
+              },
+              data: formDate
+            });
+            console.log(response);
+          } finally {
+            console.log("finally");
+          }
+          // this.$router.replace("/home");
+        } else {
+          console.log("密码为空");
         }
       }
     }

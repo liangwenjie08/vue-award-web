@@ -13,10 +13,11 @@ module.exports = merge(common, {
     compress: true,
     port: 9527,
     hot: true,
-    host: "localhost",
+    public: "http://localhost:9527",
+    host: "0.0.0.0",
     stats: "errors-only",
     open: true,
-    quiet: true,
+    quiet: false,
     overlay: true,
     writeToDisk: false,
     filename: "[name].js"

@@ -17,7 +17,7 @@ const routers = new Router({
       component: () => import("@/views/login/login.vue")
     },
     {
-      path: "/home",
+      path: "/award",
       component: () => import("@/views/home/home.vue")
     }
   ]

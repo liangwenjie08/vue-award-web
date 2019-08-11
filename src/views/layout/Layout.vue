@@ -1,9 +1,9 @@
 <template functional>
   <div id="layout">
-    <div id="header">
+    <div id="layout-header">
       <slot name="header"></slot>
     </div>
-    <div id="body">
+    <div id="layout-body">
       <div id="nav">
         <slot name="nav"></slot>
       </div>
@@ -21,20 +21,20 @@
     flex-direction: column;
   }
 
-  #header {
+  #layout-header {
     display: flex;
     flex: 0 0 60px;
     background-color: aqua;
   }
 
-  #body {
+  #layout-body {
     display: flex;
     flex: 1;
     flex-direction: row;
   }
 
   #nav {
-    display: flex;
+    overflow: auto;
   }
 
   #content {

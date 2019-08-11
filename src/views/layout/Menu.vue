@@ -7,7 +7,7 @@
     mode="vertical"
     :unique-opened="true"
   >
-    <menu-item v-for="item of menuList" :key="item.id" :item="item" />
+    <menu-item v-for="item of menuList" :key="item.menuId" :item="item" />
   </el-menu>
 </template>
 
@@ -21,11 +21,9 @@
     },
     props: {
       menuList: {
+        default: [],
         require: true
       }
-    },
-    created() {
-
     }
   };
 </script>
@@ -33,6 +31,7 @@
 <style scoped>
   .e-menu {
     border: none;
-    flex: 0 0 200px;
+    /*flex: 0 0 200px;*/
+    width: 200px;
   }
 </style>

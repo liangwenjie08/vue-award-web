@@ -23,40 +23,54 @@
 
 <script>
   import { LOGIN } from "@/api/loginAPI";
+  import { Loading } from "element-ui";
 
   export default {
     name: "login",
     data: function() {
       return {
+        isClick: false,
         username: "",
         password: ""
       };
     },
     methods: {
-      async login() {
-        if(this.username.length !== 0 && this.password.length !== 0) {
+      login() {
+        if(this.isClick) {
+          return null;
+        }
+        this.isClick = true;
+        let username = this.username.trim();
+        let password = this.password.trim();
+        if(username.length !== 0 && password.length !== 0) {
+          let loading = this.$loading();
           let formDate = new FormData();
           formDate.append("grant_type", "password");
-          formDate.append("username", this.username);
-          formDate.append("password", this.password);
-          try {
-            const response = await this.$axios.request({
-              url: LOGIN,
-              method: this.$axios.method.POST,
-              headers: {
-                // "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": "Basic c2VjdXJpdHktc2VydmljZToxMjM0NTY="
-              },
-              data: formDate
-            });
-            console.log(response);
-          } finally {
-            console.log("finally");
-          }
-          // this.$router.replace("/home");
+          formDate.append("username", username);
+          formDate.append("password", password);
+          this.$axios.request({
+            url: LOGIN,
+            method: this.$axios.method.POST,
+            headers: {
+              // "Content-Type": "application/x-www-form-urlencoded",
+              "Authorization": "Basic c2VjdXJpdHktc2VydmljZToxMjM0NTY="
+            },
+            data: formDate
+          }).then((response) => {
+            const token = response.access_token;
+            sessionStorage.setItem("token", token);
+            this.$router.replace("/award");
+          }).finally(() => {
+            this.isClick = false;
+            loading.close();
+          });
         } else {
-          console.log("密码为空");
+          this.$message({
+            message: "賬號和密碼不可為空",
+            type: "error"
+          });
         }
+        this.isClick = false;
       }
     }
   };

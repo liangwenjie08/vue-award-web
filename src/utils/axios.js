@@ -4,16 +4,16 @@ import { Message } from "element-ui";
 //easy mock
 // const baseURL = "https://easy-mock.com/mock/5d0da256be676b5daf4250ad/admin";
 //dev 服务器
-// const baseURL = "http://172.16.234.157:8000/award";
+const baseURL = "http://172.16.234.157:8000/award";
 //源权 服务器
-const baseURL = "http://172.30.20.122:8929/award";
+// const baseURL = "http://172.30.20.122:8929/award";
 
 //请求方法
 const method = {
-  GET: "get",
-  POST: "post",
-  DELETE: "delete",
-  PUT: "put"
+  GET: "GET",
+  POST: "POST",
+  DELETE: "DELETE",
+  PUT: "PUT"
 };
 
 // 5 * 1000 ms
@@ -32,7 +32,7 @@ request.interceptors.request.use(
       token = sessionStorage.getItem("token");
     }
     if(token) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = "Bearer " + token;
     }
     return config;
   },
@@ -48,7 +48,11 @@ request.interceptors.response.use(
   response => {
     const res = response.data;
     if(res.status === 200 || typeof res.access_token !== "undefined") {
-      return res;
+      if(typeof res.access_token !== "undefined") {
+        return res;
+      }
+      const data = res.data;
+      return data;
     } else {
       Message({
         message: res.message || "Error",

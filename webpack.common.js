@@ -1,60 +1,59 @@
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const CaseSensitivePathsWebpackPlugin = require("case-sensitive-paths-webpack-plugin");
-const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 
 module.exports = {
   context: path.resolve(__dirname),
   entry: {
     main: path.resolve(__dirname, "src/main.js")
   },
-  node: {
-    setImmediate: false,
-    dgram: "empty",
-    fs: "empty",
-    net: "empty",
-    tls: "empty",
-    child_process: "empty"
-  },
   plugins: [
     new VueLoaderPlugin(),
     //此Webpack插件强制所有必需模块的完整路径与磁盘上实际路径的确切大小写相匹配。
-    new CaseSensitivePathsWebpackPlugin(),
-    //更友好的进行错误提示
-    new FriendlyErrorsWebpackPlugin(),
-    //清除上次打包的dist目录
-    new CleanWebpackPlugin()
+    new CaseSensitivePathsWebpackPlugin()
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      vue$: "vue/dist/vue.runtime.esm.js"
+      "@": path.resolve(__dirname, "src")
+      // vue$: "vue/dist/vue.runtime.esm.js"
     },
     //可以省略后缀的文件
     extensions: [
       ".js",
       ".vue"
     ],
+    // import时搜索的目录
     modules: [
-      "node_modules",
-      path.resolve(__dirname, "node_modules")
+      path.resolve(__dirname, "node_modules"),
+      "node_modules"
     ]
   },
   resolveLoader: {
+    //loader搜索目录
     modules: [
-      "node_modules",
-      path.resolve(__dirname, "node_modules")
-    ]
+      path.resolve(__dirname, "node_modules"),
+      "node_modules"
+    ],
+    //可以省略后缀的文件
+    extensions: [
+      ".js",
+      ".vue"
+    ],
   },
   module: {
+    //匹配的文件都不编译
     noParse: /^(vue|vue-router|vuex|vuex-router-sync)$/,
     rules: [{
       test: /\.vue$/,
+      exclude: /node_modules/,
+      include: path.resolve(__dirname, "src"),
       use: [{
         loader: "cache-loader",
         options: {
-          cacheDirectory: path.resolve(__dirname, "node_modules/.cache/vue-loader")
+          //缓存文件夹
+          cacheDirectory: path.resolve(__dirname, "node_modules/.cache/vue-loader"),
+          //缓存失效标识符，这是默认配置
+          cacheIdentifier: "cache-loader:{version} {process.env.NODE_ENV}"
         }
       }, {
         loader: "vue-loader",
@@ -68,9 +67,11 @@ module.exports = {
     }, {
       test: /\.(png|jpe?g|gif|webp)(\?.*)?$/,
       use: [{
+        //通过base64的方式返回静态资源
         loader: "url-loader",
         options: {
           limit: 4096,
+          //超过限制时执行的loader
           fallback: {
             loader: "file-loader",
             options: {

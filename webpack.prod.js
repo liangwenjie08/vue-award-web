@@ -4,6 +4,8 @@ const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 //将css分离到单个文件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//打包时清空上次打包生成的dist目录，不要放到开发环境，否则会清空dist目录
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 const webpack = require("webpack");
@@ -13,6 +15,7 @@ const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 //将runtime内联到index.html中
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
+const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 
 module.exports = merge(common, {
   devtool: "source-map",
@@ -66,7 +69,8 @@ module.exports = merge(common, {
               publicPath: "../"
             }
           },
-          "css-loader"
+          "css-loader",
+          "postcss-loader"
         ]
       },
       {
@@ -91,13 +95,23 @@ module.exports = merge(common, {
     ]
   },
   plugins: [
+    //清除上次打包的dist目录
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
+      //压缩HTML
       minify: {
+        //移除注释
         removeComments: true,
+        //去除空白
         collapseWhitespace: true,
+        //尽可能去除多余的引号
         removeAttributeQuotes: true,
+        //布尔属性使用简写，例如：disabled = true 简写为 disabled
         collapseBooleanAttributes: true,
-        removeScriptTypeAttributes: true
+        //移除script标签的 type="text/javascript"，其他保留
+        removeScriptTypeAttributes: true,
+        //压缩css
+        minifyCSS: true
       },
       template: "./public/index.html"
     }),
@@ -134,11 +148,12 @@ module.exports = merge(common, {
       {
         hashDigest: "hex"
       }
-    )
+    ),
+    new FriendlyErrorsWebpackPlugin()
   ],
   optimization: {
-    //OptimizeCssAssetsPlugin 压缩 css
     minimize: true,
+    //OptimizeCssAssetsPlugin 压缩 css   TerserPlugin 压缩 JS
     minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
     //分离mainfest
     runtimeChunk: true,
@@ -179,11 +194,11 @@ module.exports = merge(common, {
         },
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10
+          priority: - 10
         },
         default: {
           minChunks: 2,
-          priority: -20,
+          priority: - 20,
           reuseExistingChunk: true
         }
       }

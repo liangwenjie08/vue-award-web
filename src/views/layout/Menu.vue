@@ -31,7 +31,6 @@
 <style scoped>
   .e-menu {
     border: none;
-    /*flex: 0 0 200px;*/
-    width: 200px;
+    min-width: 210px;
   }
 </style>

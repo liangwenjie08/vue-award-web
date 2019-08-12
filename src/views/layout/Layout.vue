@@ -17,7 +17,8 @@
 <style scoped>
   #layout {
     display: flex;
-    flex: 1;
+    height: 100%;
+    width: 100%;
     flex-direction: column;
   }
 
@@ -25,21 +26,25 @@
     display: flex;
     flex: 0 0 60px;
     background-color: aqua;
+    box-shadow: 0 0 3px 2px gray;
   }
 
   #layout-body {
     display: flex;
-    flex: 1;
+    height: 100%;
     flex-direction: row;
+    overflow: auto;
   }
 
   #nav {
+    flex: 0 0 210px;
     overflow: auto;
+    box-shadow: 0 0 3px 2px gray;
   }
 
   #content {
     display: flex;
     flex: 1;
-    background-color: blue;
+    padding: 10px;
   }
 </style>

@@ -6,6 +6,9 @@
     <template v-slot:nav>
       <tree-menu :menuList="menuList" />
     </template>
+    <template v-slot:content>
+      <router-view />
+    </template>
   </Layout>
 </template>
 
@@ -28,13 +31,16 @@
       };
     },
     methods: {
-      getMenuList() {
-        this.$axios.request({
-          url: TREE_MENU,
-          method: this.$axios.method.GET
-        }).then(response => {
+      async getMenuList() {
+        try {
+          const response = await this.$axios.request({
+            url: TREE_MENU,
+            method: this.$axios.method.GET
+          });
           this.menuList = response;
-        });
+        } catch(e) {
+          this.menuList = [];
+        }
       }
     },
     mounted() {
@@ -42,7 +48,3 @@
     }
   };
 </script>
-
-<style scoped>
-
-</style>

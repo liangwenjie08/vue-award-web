@@ -1,6 +1,6 @@
 <template>
   <div id="login">
-    <div class="card">
+    <div class="card" v-on:keyup.enter="login()">
       <el-input
         prefix-icon="el-icon-user-solid"
         class="e-input"
@@ -35,7 +35,7 @@
       };
     },
     methods: {
-      login() {
+      async login() {
         if(this.isClick) {
           return null;
         }
@@ -48,22 +48,23 @@
           formDate.append("grant_type", "password");
           formDate.append("username", username);
           formDate.append("password", password);
-          this.$axios.request({
-            url: LOGIN,
-            method: this.$axios.method.POST,
-            headers: {
-              // "Content-Type": "application/x-www-form-urlencoded",
-              "Authorization": "Basic c2VjdXJpdHktc2VydmljZToxMjM0NTY="
-            },
-            data: formDate
-          }).then((response) => {
+          try {
+            const response = await this.$axios.request({
+              url: LOGIN,
+              method: this.$axios.method.POST,
+              headers: {
+                // "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic c2VjdXJpdHktc2VydmljZToxMjM0NTY="
+              },
+              data: formDate
+            });
             const token = response.access_token;
             sessionStorage.setItem("token", token);
             this.$router.replace("/award");
-          }).finally(() => {
+          } finally {
             this.isClick = false;
             loading.close();
-          });
+          }
         } else {
           this.$message({
             message: "賬號和密碼不可為空",

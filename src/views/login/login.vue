@@ -60,7 +60,7 @@
             });
             const token = response.access_token;
             sessionStorage.setItem("token", token);
-            this.$router.replace("/award");
+            this.$router.replace("/mes");
           } finally {
             this.isClick = false;
             loading.close();

@@ -1,50 +1,62 @@
-<template functional>
-  <div id="layout">
-    <div id="layout-header">
-      <slot name="header"></slot>
-    </div>
-    <div id="layout-body">
-      <div id="nav">
-        <slot name="nav"></slot>
+<template>
+  <Layout>
+    <template v-slot:header>
+      <layout-header />
+    </template>
+    <template v-slot:nav>
+      <tree-menu :menuList="menuList" />
+    </template>
+    <template v-slot:content>
+      <div class="container">
+        <router-view />
       </div>
-      <div id="content">
-        <slot name="content"></slot>
-      </div>
-    </div>
-  </div>
+    </template>
+  </Layout>
 </template>
 
+<script>
+  import Layout from "@/components/layout/Layout";
+  import Menu from "@/components/layout/Menu";
+  import Header from "@/components/layout/Header";
+  import { TREE_MENU } from "@/api/homeAPI";
+
+  export default {
+    name: "home",
+    components: {
+      Layout,
+      "tree-menu": Menu,
+      "layout-header": Header
+    },
+    data() {
+      return {
+        menuList: []
+      };
+    },
+    methods: {
+      async getMenuList() {
+        try {
+          const response = await this.$axios.request({
+            url: TREE_MENU,
+            method: this.$axios.method.GET
+          });
+          this.menuList = response;
+        } catch(e) {
+          this.menuList = [];
+        }
+      }
+    },
+    mounted() {
+      this.getMenuList();
+    }
+  };
+</script>
+
 <style scoped>
-  #layout {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
-  }
-
-  #layout-header {
-    display: flex;
-    flex: 0 0 60px;
-    background-color: aqua;
-    box-shadow: 0 0 3px 2px gray;
-  }
-
-  #layout-body {
-    display: flex;
-    height: 100%;
-    flex-direction: row;
-    overflow: auto;
-  }
-
-  #nav {
-    flex: 0 0 210px;
-    overflow: auto;
-    box-shadow: 0 0 3px 2px gray;
-  }
-
-  #content {
+  .container {
     display: flex;
     flex: 1;
     padding: 10px;
+    background-color: white;
+    box-shadow: 0 0 1px gray;
   }
 </style>

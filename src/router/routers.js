@@ -17,8 +17,18 @@ const routers = new Router({
       component: () => import("@/views/login/login.vue")
     },
     {
-      path: "/award",
-      component: () => import("@/views/home/home.vue")
+      path: "/mes/",
+      component: () => import("@/views/layout/layout.vue"),
+      children: [
+        {
+          path: "/",
+          component: () => import("@/views/home/home.vue")
+        },
+        {
+          path: "employee/list",
+          component: () => import("@/views/employee_management/employee_list.vue")
+        }
+      ]
     }
   ]
 });

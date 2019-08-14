@@ -31,7 +31,8 @@
 
   #layout-body {
     display: flex;
-    height: 100%;
+    height: calc(100% - 60px);
+    width: 100%;
     flex-direction: row;
     overflow: auto;
   }
@@ -43,9 +44,10 @@
   }
 
   #content {
-    display: flex;
-    flex: 1;
+    height: 100%;
+    width: calc(100% - 210px);
     padding: 10px;
     background-color: #E7EAED;
+    box-sizing: border-box;
   }
 </style>

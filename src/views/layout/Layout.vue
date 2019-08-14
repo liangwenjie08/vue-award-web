@@ -7,7 +7,7 @@
       <tree-menu :menuList="menuList" />
     </template>
     <template v-slot:content>
-      <div class="container">
+      <div id="container">
         <router-view />
       </div>
     </template>
@@ -52,11 +52,13 @@
 </script>
 
 <style scoped>
-  .container {
-    display: flex;
-    flex: 1;
+  #container {
+    height: 100%;
+    width: 100%;
     padding: 10px;
     background-color: white;
     box-shadow: 0 0 1px gray;
+    overflow: auto;
+    box-sizing: border-box;
   }
 </style>

@@ -27,6 +27,10 @@ const routers = new Router({
         {
           path: "employee/list",
           component: () => import("@/views/employee_management/employee_list.vue")
+        },
+        {
+          path: "employee/files",
+          component: () => import("@/views/employee_file/employee_file.vue")
         }
       ]
     }

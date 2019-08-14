@@ -4,9 +4,9 @@ import { Message } from "element-ui";
 //easy mock
 // const baseURL = "https://easy-mock.com/mock/5d0da256be676b5daf4250ad/admin";
 //dev 服务器
-const baseURL = "http://172.16.234.157:8000/award";
+// const baseURL = "http://172.16.234.157:8000/award";
 //源权 服务器
-// const baseURL = "http://172.30.20.122:8929/award";
+const baseURL = "http://172.30.20.122:8929/award";
 
 //请求方法
 const method = {

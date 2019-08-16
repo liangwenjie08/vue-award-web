@@ -86,7 +86,7 @@
 
   #login {
     display: flex;
-    flex: 1;
+    height: 100%;
     justify-content: center;
     align-items: center;
     background-color: @containerColor;

@@ -14,40 +14,37 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="less" scoped>
   #layout {
-    display: flex;
     height: 100%;
     width: 100%;
-    flex-direction: column;
-  }
 
-  #layout-header {
-    display: flex;
-    flex: 0 0 60px;
-    background-color: aqua;
-    box-shadow: 0 0 3px 2px gray;
-  }
+    #layout-header {
+      display: flex;
+      height: 60px;
+      background-color: aqua;
+      box-shadow: 0 0 3px 2px gray;
+    }
 
-  #layout-body {
-    display: flex;
-    height: calc(100% - 60px);
-    width: 100%;
-    flex-direction: row;
-    overflow: auto;
-  }
+    #layout-body {
+      display: flex;
+      height: calc(100% - 60px);
+      flex-direction: row;
+      overflow: auto;
+    }
 
-  #nav {
-    flex: 0 0 210px;
-    overflow: auto;
-    box-shadow: 0 0 3px 2px gray;
-  }
+    #nav {
+      flex: 0 0 210px;
+      overflow: auto;
+      box-shadow: 0 0 3px 2px gray;
+    }
 
-  #content {
-    height: 100%;
-    width: calc(100% - 210px);
-    padding: 10px;
-    background-color: #E7EAED;
-    box-sizing: border-box;
+    #content {
+      height: 100%;
+      width: calc(100% - 210px);
+      padding: 10px;
+      background-color: #E7EAED;
+      box-sizing: border-box;
+    }
   }
 </style>

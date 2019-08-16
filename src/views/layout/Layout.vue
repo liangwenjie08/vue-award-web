@@ -54,7 +54,6 @@
 <style scoped>
   #container {
     height: 100%;
-    width: 100%;
     padding: 10px;
     background-color: white;
     box-shadow: 0 0 1px gray;

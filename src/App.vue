@@ -19,4 +19,14 @@
     display: flex;
     flex-direction: column;
   }
+
+  body {
+    .el-table th.gutter {
+      display: table-cell !important;
+    }
+
+    .el-table colgroup.gutter {
+      display: table-cell !important;
+    }
+  }
 </style>

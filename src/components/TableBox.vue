@@ -1,5 +1,6 @@
 <template functional>
   <el-table
+    ref="tableBoxRef"
     :data="props.data"
     border
     height="100%"

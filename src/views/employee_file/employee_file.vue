@@ -1,14 +1,22 @@
 <template>
   <div id="employee_file">
-    <div style="height: 150px;width: 200px;">
-      <p>this is header</p>
+    <div class="header">
+      <el-button style="background-color: #5CB85C;" type="primary" icon="el-icon-plus">增加</el-button>
+      <el-button style="background-color: red;" type="primary" icon="el-icon-delete-solid">刪除</el-button>
+      <el-button style="background-color: #5BC0DE;" type="primary" icon="el-icon-edit">更新</el-button>
+      <el-button style="background-color: #418DCF;" type="primary" icon="el-icon-document">查看明細</el-button>
+      <el-button style="background-color: #418DCF;" type="primary" icon="el-icon-upload2">批量録入</el-button>
+      <el-button style="background-color: #418DCF;" type="primary" icon="el-icon-download">模板下載</el-button>
+      <el-button style="background-color: #418DCF;" type="primary" icon="el-icon-download">導出Excel</el-button>
+      <el-button style="background-color: #53C0B0;" type="primary" icon="el-icon-download">報表統計</el-button>
+
     </div>
     <div style="height: 100%;">
       <table-box :data="employeeList">
         <el-table-column
           prop="empId"
           label="工號"
-          width="80"
+          width="85"
           fixed="left"
           align="center"
         />
@@ -22,7 +30,7 @@
         <el-table-column
           prop="deptDesc"
           label="部門"
-          width="120"
+          width="100"
           fixed="left"
           show-overflow-tooltip
           align="center"
@@ -126,6 +134,14 @@
         />
       </table-box>
     </div>
+    <el-pagination
+      background
+      :total="total"
+      :current-page="pageNum"
+      :page-size="pageSize"
+      :page-sizes="[50, 100, 200]"
+      layout="total, prev, pager, next, sizes"
+    />
   </div>
 </template>
 
@@ -137,7 +153,10 @@
     name: "employee_file",
     data() {
       return {
-        employeeList: []
+        employeeList: [],
+        pageNum: 1,
+        pageSize: 50,
+        total: 0
       };
     },
     created() {
@@ -151,8 +170,13 @@
             url,
             method: this.$axios.method.GET
           });
-          console.log(res);
           this.employeeList = res.list;
+          this.total = res.total;
+          this.pageNum = res.pageNum;
+          this.pageSize = res.pageSize;
+          this.$nextTick(function() {
+            this.$refs.tableBoxRef.doLayout();
+          });
         } catch(e) {
           this.employeeList = [];
         }
@@ -167,5 +191,9 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
+
+    .header {
+      padding: 0 0 20px 0;
+    }
   }
 </style>

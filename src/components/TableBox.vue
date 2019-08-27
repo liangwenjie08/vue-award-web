@@ -7,6 +7,8 @@
     style="width:100%;"
     tooltip-effect="light"
     size="mini"
+    v-bind="data.attrs"
+    v-on="listeners"
   >
     <slot></slot>
   </el-table>

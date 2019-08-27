@@ -10,7 +10,12 @@ import {
   MenuItem,
   TableColumn,
   Table,
-  Pagination
+  Pagination,
+  Cascader,
+  Select,
+  Option,
+  DatePicker,
+  Checkbox,
 } from "element-ui";
 import TableBox from "@/components/TableBox";
 import { message, loading } from "@/utils/utility_class";
@@ -24,6 +29,12 @@ Vue.use(Submenu);
 Vue.use(MenuItem);
 Vue.use(Table);
 Vue.use(TableColumn);
+Vue.use(Cascader);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(DatePicker);
+Vue.use(Checkbox);
+
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);
 Vue.use(Plugin);

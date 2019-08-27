@@ -16,8 +16,8 @@ const method = {
   PUT: "PUT"
 };
 
-// 5 * 1000 ms
-const timeout = 5000;
+// 15 * 1000 ms
+const timeout = 15000;
 const tipsShowTime = 5000;
 
 const request = axios.create({
@@ -54,12 +54,21 @@ request.interceptors.response.use(
       const data = res.data;
       return data;
     } else {
-      Message({
-        message: res.message || "Error",
-        type: "error",
-        duration: tipsShowTime,
-        center: true
-      });
+      if(res.status === 400) {
+        Message({
+          message: res.message || "Error",
+          type: "warning",
+          duration: tipsShowTime,
+          center: true
+        });
+      } else {
+        Message({
+          message: res.message || "Error",
+          type: "error",
+          duration: tipsShowTime,
+          center: true
+        });
+      }
       return Promise.reject(new Error(res.message || "Error"));
     }
   },

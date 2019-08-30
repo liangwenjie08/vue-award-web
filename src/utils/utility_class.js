@@ -36,3 +36,16 @@ export function loading(options = { text: "loading" }) {
 export function disabledDate(time) {
   return time.getTime() > Date.now();
 }
+
+//前端分頁函數
+export function frontEndPagination(data = [], page = 1, size = 50) {
+  const total = data.length;
+  if(total > 0) {
+    const start = (page - 1) * size;
+    const end = page * size;
+    const paginationData = data.slice(start, total >= end ? end : total);
+    return paginationData;
+  } else {
+    return [];
+  }
+}

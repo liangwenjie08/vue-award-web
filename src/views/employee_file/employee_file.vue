@@ -400,7 +400,6 @@
   import { default_page_size } from "@/utils/common_variable";
   import { disabledDate } from "@/utils/utility_class";
 
-
   export default {
     name: "employee_file",
     data() {
@@ -476,9 +475,8 @@
       };
     },
     computed: {
-      // 计算属性的 getter
+      // 文件上傳
       upload_file: function() {
-        // `this` 指向 vm 实例
         return UPLOAD_FILE;
       }
     },
@@ -1031,7 +1029,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 100%;
+    /*width: 100%;*/
 
     .header {
       padding: 0 0 15px 0;

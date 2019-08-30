@@ -7,6 +7,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import {
   Button,
   Input,
+  InputNumber,
   Menu,
   Submenu,
   MenuItem,
@@ -26,10 +27,14 @@ import TableBox from "@/components/TableBox";
 import { message, loading, notification } from "@/utils/utility_class";
 import axios from "@/utils/axios";
 import FileUpload from "@/components/FileUpload";
+import FileDownload from "@/components/FileDownload";
+import Delete from "@/components/Delete";
+import Department from "@/components/Department";
 
 Vue.use(Pagination);
 Vue.use(Button);
 Vue.use(Input);
+Vue.use(InputNumber);
 Vue.use(Menu);
 Vue.use(Submenu);
 Vue.use(MenuItem);
@@ -46,6 +51,9 @@ Vue.use(Dialog);
 
 Vue.component("treeselect", Treeselect);
 Vue.component("file-upload", FileUpload);
+Vue.component("file-download", FileDownload);
+Vue.component("delete-button", Delete);
+Vue.component("department", Department);
 
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);

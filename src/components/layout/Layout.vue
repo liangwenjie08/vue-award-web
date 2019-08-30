@@ -35,7 +35,7 @@
 
     #nav {
       flex: 0 0 210px;
-      overflow: auto;
+      overflow: hidden auto;
       box-shadow: 0 0 3px 2px gray;
     }
 

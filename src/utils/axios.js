@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Message } from "element-ui";
+import { saveAs } from "file-saver";
 
 //easy mock
 // const baseURL = "https://easy-mock.com/mock/5d0da256be676b5daf4250ad/admin";
@@ -7,6 +8,8 @@ import { Message } from "element-ui";
 const baseURL = "http://172.16.234.157:8000/award";
 //源权 服务器
 // const baseURL = "http://172.30.20.122:8929/award";
+//先员 服务器
+// const baseURL = "http://172.30.20.29:8928/award";
 
 //请求方法
 const method = {
@@ -46,30 +49,67 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   response => {
-    const res = response.data;
-    if(res.status === 200 || typeof res.access_token !== "undefined") {
-      if(typeof res.access_token !== "undefined") {
-        return res;
-      }
-      const data = res.data;
-      return data;
-    } else {
-      if(res.status === 400) {
-        Message({
-          message: res.message || "Error",
-          type: "warning",
-          duration: tipsShowTime,
-          center: true
-        });
+    const { config: { responseType }, data: res } = response;
+    if(responseType && responseType === "blob") {
+      if(res.type && res.type !== "application/json") {
+        try {
+          const headers = response.headers;
+          const contentDisposition = headers["content-disposition"];
+          const filename = contentDisposition.split("=")[1];
+          saveAs(res, filename || "template.xls");
+          Message({
+            message: "下載成功",
+            type: "success",
+            duration: tipsShowTime,
+            center: true
+          });
+          return Promise.resolve();
+        } catch(e) {
+          Message({
+            message: e || "Error",
+            type: "error",
+            duration: tipsShowTime,
+            center: true
+          });
+          return Promise.reject("保存文件失敗");
+        }
       } else {
-        Message({
-          message: res.message || "Error",
-          type: "error",
-          duration: tipsShowTime,
-          center: true
+        res.text().then((jsonDataStr) => {
+          const jsonData = JSON.parse(jsonDataStr);
+          Message({
+            message: jsonData.message || "Error",
+            type: "error",
+            duration: tipsShowTime,
+            center: true
+          });
         });
+        return Promise.reject("文件下載失敗");
       }
-      return Promise.reject(new Error(res.message || "Error"));
+    } else {
+      if(res.status === 200 || typeof res.access_token !== "undefined") {
+        if(typeof res.access_token !== "undefined") {
+          return res;
+        }
+        const data = res.data;
+        return data;
+      } else {
+        if(res.status === 400) {
+          Message({
+            message: res.message || "Error",
+            type: "warning",
+            duration: tipsShowTime,
+            center: true
+          });
+        } else {
+          Message({
+            message: res.message || "Error",
+            type: "error",
+            duration: tipsShowTime,
+            center: true
+          });
+        }
+        return Promise.reject(new Error(res.message || "Error"));
+      }
     }
   },
   error => {

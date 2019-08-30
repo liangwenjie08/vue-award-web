@@ -13,7 +13,6 @@ import {
   TableColumn,
   Table,
   Pagination,
-  Cascader,
   Select,
   Option,
   DatePicker,
@@ -26,6 +25,7 @@ import {
 import TableBox from "@/components/TableBox";
 import { message, loading, notification } from "@/utils/utility_class";
 import axios from "@/utils/axios";
+import FileUpload from "@/components/FileUpload";
 
 Vue.use(Pagination);
 Vue.use(Button);
@@ -35,7 +35,6 @@ Vue.use(Submenu);
 Vue.use(MenuItem);
 Vue.use(Table);
 Vue.use(TableColumn);
-Vue.use(Cascader);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(DatePicker);
@@ -46,6 +45,7 @@ Vue.use(Popover);
 Vue.use(Dialog);
 
 Vue.component("treeselect", Treeselect);
+Vue.component("file-upload", FileUpload);
 
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);

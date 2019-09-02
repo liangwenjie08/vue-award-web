@@ -69,7 +69,7 @@
       :page-size="pageSize"
       @size-change="sizeChange"
       @current-change="pageChange"
-    />
+    ></el-pagination>
     <el-dialog width="30%" :title="`${isUpdateOperation ? '更新' : '新增'}崗位信息`" :visible.sync="dialogVisible">
       <div class="dialog-cell-item">
         <span class="span-distance">所屬部門</span>
@@ -215,7 +215,6 @@
       },
       async addAndUpdateAxios() {
         const { deptId, posId, bonusItemId, value, date, isUpdateOperation, bonusURL } = this;
-        console.log(deptId, posId, bonusItemId, value, date);
         if(!deptId) {
           this.$message({
             message: "部門不允許為空!",

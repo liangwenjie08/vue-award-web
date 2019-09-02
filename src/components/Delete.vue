@@ -39,6 +39,10 @@
       descriptionKey: {
         type: String,
         required: true
+      },
+      deleteCallback: {
+        type: Function,
+        required: true
       }
     },
     data() {
@@ -81,6 +85,7 @@
           this.$message({
             message: "刪除成功"
           });
+          this.deleteCallback();
         } finally {
           this.isClick = false;
           this.deleteConfirmVisible = false;
@@ -90,7 +95,3 @@
     }
   };
 </script>
-
-<style scoped>
-
-</style>

@@ -9,7 +9,8 @@
                  icon="el-icon-edit">
         更新
       </el-button>
-      <delete-button description-key="empName" id-key="empId" :selected-data="selectedData" :url="employeeURL" />
+      <delete-button :deleteCallback="getEmployeeList" description-key="empName" id-key="empId"
+                     :selected-data="selectedData" :url="employeeURL" />
       <file-upload :url="importURL" />
       <file-download :url="downloadTemplateURL" />
     </div>
@@ -93,7 +94,7 @@
       <div class="dialog-row-item">
         <div class="dialog-cell-item">
           <span class="span-distance">員工編號</span>
-          <el-input clearable v-model="empId" placeholder="員工編號"></el-input>
+          <el-input :disabled="isUpdateOperation" clearable v-model="empId" placeholder="員工編號"></el-input>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">員工姓名</span>
@@ -108,7 +109,7 @@
         <div class="dialog-cell-item">
           <span class="span-distance">考牌數</span>
           <el-input-number :min="0" style="width: 100%;" :controls="false"
-                           v-model="placardNums" placeholder="考牌數" />
+                           v-model="placardNums" placeholder="考牌數"></el-input-number>
         </div>
       </div>
       <div class="dialog-row-item">
@@ -168,8 +169,8 @@
 
 <script>
   //API
-  import { EMPLOYEE, DOWNLOAD_TEMPLATE, IMPORT, POSITION } from "@/api/employee_list";
-  import { frontEndPagination, disabledDate } from "@/utils/utility_class";
+  import { DOWNLOAD_TEMPLATE, EMPLOYEE, IMPORT, POSITION } from "@/api/employee_list";
+  import { disabledDate, frontEndPagination } from "@/utils/utility_class";
 
   export default {
     name: "employee_list",
@@ -224,10 +225,9 @@
     methods: {
       async getEmployeeList() {
         try {
-          const res = await this.$axios.request({
+          this.employeeList = await this.$axios.request({
             url: EMPLOYEE
           });
-          this.employeeList = res;
           this.getPaginationData(this.pageNum, this.pageSize);
         } catch(e) {
           this.employeeList = [];
@@ -236,8 +236,14 @@
       },
       addAndUpdateBtnHandler(isUpdateOperation) {
         if(isUpdateOperation) {
+          if(!this.selectedData) {
+            this.$message({
+              message: "請選擇要修改的數據!",
+              type: "error"
+            });
+            return null;
+          }
           const { empName, empId, deptId, posId, isRejoin, isSpec, phone, placardNums, joinDate, leaveDate, isOnjob } = this.selectedData;
-          console.log(empName, empId, deptId, posId, isRejoin, isSpec, phone, placardNums, joinDate, leaveDate, isOnjob);
           this.empName = empName;
           this.empId = empId;
           this.deptId = deptId;
@@ -330,8 +336,12 @@
         this.isClick = true;
         try {
           const { request, method } = this.$axios;
+          let url = EMPLOYEE;
+          if(isUpdateOperation) {
+            url += `/${ empId }`;
+          }
           await request({
-            url: EMPLOYEE,
+            url,
             method: isUpdateOperation ? method.PUT : method.POST,
             data: {
               empName,
@@ -351,6 +361,7 @@
             message: isUpdateOperation ? "更新成功" : "新增成功"
           });
           this.dialogVisible = false;
+          this.getEmployeeList();
         } finally {
           this.isClick = false;
         }
@@ -387,6 +398,7 @@
         const deptId = this.deptId;
         if(deptId === undefined) {
           this.positionList = [];
+          this.posId = undefined;
         } else {
           this.positionList = await this.$axios.request({
             url: POSITION,
@@ -412,7 +424,6 @@
 
     .table {
       height: 100%;
-      background-color: #53C0B0;
     }
 
     .dialog-row-item {

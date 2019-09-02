@@ -31,6 +31,22 @@ const routers = new Router({
         {
           path: "employee/files",
           component: () => import("@/views/employee_file/employee_file.vue")
+        },
+        {
+          path: "dept/positionList",
+          component: () => import("@/views/position_management/position_list.vue")
+        },
+        {
+          path: "bonus/bonusList",
+          component: () => import("@/views/bonus_management/position_bonus_list.vue")
+        },
+        {
+          path: "bonus/allowancemaster",
+          component: () => import("@/views/bonus_management/bonus_item_list.vue")
+        },
+        {
+          path: "bonus/employee/bonusList",
+          component: () => import("@/views/bonus_management/employee_bonus_list.vue")
         }
       ]
     }

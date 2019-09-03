@@ -1,8 +1,8 @@
 <template>
   <treeselect
     :options="departmentList"
-    :normalizer="normalizer"
     :style="{width: '100%',height: '32px',cursor: disabled ? 'not-allowed' : ''}"
+    :normalizer="normalizer"
     placeholder="部門"
     :defaultExpandLevel="2"
     :value="value"
@@ -15,7 +15,7 @@
   import { store, mutations } from "@/utils/common_variable";
 
   export default {
-    name: "Department",
+    name: "TextileDepartment",
     props: {
       value: {
         required: true
@@ -30,14 +30,14 @@
       };
     },
     computed: {
-      storeDepartmentList() {
-        return store.departmentList;
+      storeTextileDepartmentList() {
+        return store.textileDepartmentList;
       }
     },
     created() {
-      const storeDepartmentList = this.storeDepartmentList;
-      if(storeDepartmentList.length > 0) {
-        this.departmentList = storeDepartmentList;
+      const storeTextileDepartmentList = this.storeTextileDepartmentList;
+      if(storeTextileDepartmentList.length > 0) {
+        this.departmentList = storeTextileDepartmentList;
       } else {
         this.getDepartmentList();
       }
@@ -45,15 +45,18 @@
     methods: {
       async getDepartmentList() {
         const res = await this.$axios.request({
-          url: "/api/position/dept"
+          url: "/department",
+          params: {
+            tree: true
+          }
         });
         this.departmentList = res;
-        mutations.setDepartmentList(res);
+        mutations.setTextileDepartmentList(res);
       },
       normalizer(node) {
         return {
-          id: node.deptId,
-          label: node.deptDesc,
+          id: node.id,
+          label: node.name,
           children: node.children && node.children.length > 0 ? node.children : undefined
         };
       }

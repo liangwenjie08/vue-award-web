@@ -1,12 +1,18 @@
 import Vue from "vue";
 
 export const store = Vue.observable({
-  departmentList: []
+  //QM奖金部门列表
+  departmentList: [],
+  //纺织厂部门列表
+  textileDepartmentList: []
 });
 
 export const mutations = {
   setDepartmentList(departmentList) {
     store.departmentList = departmentList;
+  },
+  setTextileDepartmentList(textileDepartmentList) {
+    store.textileDepartmentList = textileDepartmentList;
   }
 };
 

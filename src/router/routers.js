@@ -75,6 +75,10 @@ const routers = new Router({
         {
           path: "checkinout/import",
           component: () => import("@/views/center_control_attendance/dingding_attendance.vue")
+        },
+        {
+          path: "trainManagement/trainingList",
+          component: () => import("@/views/training_management/train_list.vue")
         }
       ]
     }

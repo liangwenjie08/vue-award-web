@@ -30,6 +30,7 @@ import FileUpload from "@/components/FileUpload";
 import FileDownload from "@/components/FileDownload";
 import Delete from "@/components/Delete";
 import Department from "@/components/Department";
+import TextileDepartment from "@/components/TextileDepartment.vue";
 
 Vue.use(Pagination);
 Vue.use(Button);
@@ -54,6 +55,7 @@ Vue.component("file-upload", FileUpload);
 Vue.component("file-download", FileDownload);
 Vue.component("delete-button", Delete);
 Vue.component("department", Department);
+Vue.component("textile-department", TextileDepartment);
 
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);

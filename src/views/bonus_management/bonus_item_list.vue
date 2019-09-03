@@ -25,6 +25,7 @@
           prop="itemType"
           label="津貼項類型"
           align="center"
+          :formatter="itemTypeFormatter"
         ></el-table-column>
         <el-table-column
           min-width="200"
@@ -51,7 +52,7 @@
       </div>
       <div class="dialog-cell-item">
         <span class="span-distance">津貼項類型</span>
-        <el-select v-model="itemType" placeholder="津貼項類型">
+        <el-select  default-first-option filterable v-model="itemType" placeholder="津貼項類型">
           <el-option
             :key="item.itemType"
             :label="item.title"
@@ -211,6 +212,9 @@
       selectedRow(data) {
         this.selectedData = data;
       },
+      itemTypeFormatter(row) {
+        return row.itemType === 0 ? "崗位津貼項" : "員工津貼項";
+      }
     }
   };
 </script>

@@ -2,11 +2,12 @@
   <treeselect
     :options="departmentList"
     :normalizer="normalizer"
-    style="width: 100%;height: 32px;"
+    :style="{width: '100%',height: '32px',cursor: disabled ? 'not-allowed' : ''}"
     placeholder="部門"
     :defaultExpandLevel="2"
     :value="value"
     @input="$emit('input', $event)"
+    :disabled="disabled"
   />
 </template>
 
@@ -15,7 +16,14 @@
 
   export default {
     name: "Department",
-    props: ["value"],
+    props: {
+      value: {
+        required: true
+      },
+      disabled: {
+        default: false
+      }
+    },
     data() {
       return {
         departmentList: []

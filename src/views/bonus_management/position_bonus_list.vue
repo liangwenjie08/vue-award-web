@@ -77,7 +77,7 @@
       </div>
       <div class="dialog-cell-item">
         <span class="span-distance">崗位</span>
-        <el-select v-model="posId" placeholder="崗位">
+        <el-select default-first-option filterable  v-model="posId" placeholder="崗位">
           <el-option
             :key="item.posId"
             :label="item.posDesc"
@@ -88,7 +88,7 @@
       </div>
       <div class="dialog-cell-item">
         <span class="span-distance">津貼項</span>
-        <el-select v-model="bonusItemId" placeholder="津貼項">
+        <el-select default-first-option filterable  v-model="bonusItemId" placeholder="津貼項">
           <el-option
             :key="item.itemId"
             :value="item.itemId"

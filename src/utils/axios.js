@@ -19,8 +19,9 @@ const method = {
   PUT: "PUT"
 };
 
-// 15 * 1000 ms
-const timeout = 15000;
+// http請求超時時間： 60s
+const timeout = 60000;
+// 提示展示時間：5s
 const tipsShowTime = 5000;
 
 const request = axios.create({

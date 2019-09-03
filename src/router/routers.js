@@ -71,6 +71,10 @@ const routers = new Router({
         {
           path: "configManagement/holidayConf",
           component: () => import("@/views/configuration_management/holiday_configuration.vue")
+        },
+        {
+          path: "checkinout/import",
+          component: () => import("@/views/center_control_attendance/dingding_attendance.vue")
         }
       ]
     }

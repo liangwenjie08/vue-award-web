@@ -1,5 +1,5 @@
 <template>
-  <div id="employee_bonus_list">
+  <div id="machine_configuration">
     <div class="header">
       <el-button @click="addAndUpdateBtnHandler(false)" style="background-color: #53C0B0;" type="primary"
                  icon="el-icon-plus">
@@ -9,17 +9,11 @@
                  icon="el-icon-edit">
         更新
       </el-button>
-      <delete-button :delete-callback="getEmployeeBonusList" description-key="empName" id-key="id"
-                     :selected-data="selectedData" :url="employeeBonusURL" />
+      <delete-button :delete-callback="getMachineList" description-key="machineNo" id-key="id"
+                     :selected-data="selectedData" :url="machineURL" />
     </div>
     <div class="table">
       <table-box @current-change="selectedRow" :data="paginationData" highlight-current-row>
-        <el-table-column
-          min-width="90"
-          prop="empName"
-          label="員工姓名"
-          align="center"
-        ></el-table-column>
         <el-table-column
           min-width="110"
           prop="deptDesc"
@@ -27,34 +21,29 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="90"
-          prop="itemId"
-          label="津貼項編號"
+          min-width="140"
+          prop="machineNo"
+          label="機器編號"
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="120"
-          prop="itemDesc"
-          label="津貼項描述"
+          min-width="70"
+          prop="machineTypeId"
+          label="機器類型"
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="80"
-          prop="value"
-          label="個數/金額"
+          min-width="450"
+          prop="formulaDesc"
+          label="公式"
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="100"
-          prop="dateFrom"
-          label="開始時間"
+          min-width="70"
+          prop="isChemicalFiber"
+          label="是否化纖"
           align="center"
-        ></el-table-column>
-        <el-table-column
-          min-width="100"
-          prop="dateTo"
-          label="結束時間"
-          align="center"
+          :formatter="isChemicalFiberFormatter"
         ></el-table-column>
       </table-box>
     </div>
@@ -68,49 +57,38 @@
       @size-change="sizeChange"
       @current-change="pageChange"
     ></el-pagination>
-    <el-dialog width="30%" :title="`${isUpdateOperation ? '更新' : '新增'}崗位信息`" :visible.sync="dialogVisible">
+    <el-dialog width="30%" :title="`${isUpdateOperation ? '更新' : '新增'}機器`" :visible.sync="dialogVisible">
       <div class="dialog-cell-item">
         <span class="span-distance">部門</span>
         <department :disabled="isUpdateOperation" @input="deptChange" v-model="deptId"></department>
       </div>
       <div class="dialog-cell-item">
-        <span class="span-distance">員工列表</span>
-        <el-select default-first-option filterable :disabled="isUpdateOperation" v-model="empId" placeholder="員工列表">
+        <span class="span-distance">機器編號</span>
+        <el-input clearable v-model="machineNo" placeholder="機器編號"></el-input>
+      </div>
+      <div class="dialog-cell-item">
+        <span class="span-distance">機器類型</span>
+        <el-select @change="machineTypeChange" v-model="machineTypeId" placeholder="機器類型">
           <el-option
-            :key="item.empId"
-            :value="item.empId"
-            :label="item.empName"
-            v-for="item of empList"
+            :key="item.id"
+            :label="item.machineTypeDesc"
+            :value="item.id"
+            v-for="item of machineTypeList"
           />
         </el-select>
       </div>
       <div class="dialog-cell-item">
-        <span class="span-distance">津貼項</span>
-        <el-select default-first-option filterable :disabled="isUpdateOperation" v-model="itemId" placeholder="津貼項">
-          <el-option
-            :key="item.itemId"
-            :value="item.itemId"
-            :label="item.itemDesc"
-            v-for="item of itemList"
-          />
-        </el-select>
+        <span class="span-distance">公式</span>
+        <el-input type="textarea" readonly v-model="formulaDescription"
+                  placeholder="公式"></el-input>
       </div>
       <div class="dialog-cell-item">
-        <span class="span-distance">數量</span>
-        <el-input-number :min="0" style="width: 100%;" :controls="false"
-                         v-model="value" placeholder="數量"></el-input-number>
-      </div>
-      <div class="dialog-cell-item">
-        <span class="span-distance">日期</span>
-        <el-date-picker :disabled="isUpdateOperation" type="daterange" clearable style="width: 100%;" v-model="date"
-                        range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期"
-                        value-format="yyyy-MM-dd"
-                        format="yyyyMMdd" />
+        <el-checkbox v-model="isChemicalFiber">是否化纖</el-checkbox>
       </div>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button style="background-color: #418DCF;" type="primary" @click="addAndUpdateAxios">
-          {{this.isUpdateOperation ? "更 新" : "确 定"}}
+          {{isUpdateOperation ? "更 新" : "确 定"}}
         </el-button>
       </div>
     </el-dialog>
@@ -118,85 +96,67 @@
 </template>
 
 <script>
-  import { EMPLOYEE_BONUS, BONUS_ITEM, EMPLOYEE } from "@/api/bonus";
+  import { MACHINE, MACHINE_TYPE } from "@/api/configuration_management.js";
   import { frontEndPagination } from "@/utils/utility_class";
 
   export default {
-    name: "employee_bonus_list",
+    name: "machine_configuration",
     data() {
       return {
         isClick: false,
-        //員工津貼列表
-        employeeBonusList: [],
-        //分頁之後顯示在表格中的數據
+        machineList: [],
         paginationData: [],
-        //津貼項列表
-        itemList: [],
-        //員工列表
-        empList: [],
+        machineTypeList: [],
         selectedData: null,
         pageNum: 1,
         pageSize: 50,
         isUpdateOperation: false,
         dialogVisible: false,
         //新增和更新請求參數
-        itemId: undefined,
-        empId: undefined,
+        machineNo: "",
         deptId: undefined,
-        value: 0,
-        date: null
+        machineTypeId: undefined,
+        formulaDescription: "",
+        isChemicalFiber: false
       };
     },
     computed: {
       total() {
-        return this.employeeBonusList.length;
+        return this.machineList.length;
       },
-      employeeBonusURL() {
-        return EMPLOYEE_BONUS;
+      machineURL() {
+        return MACHINE;
       }
     },
     created() {
-      this.getEmployeeBonusList();
-      this.getItemList();
+      this.getMachineList();
     },
     methods: {
-      async getEmployeeBonusList() {
+      async getMachineList() {
         try {
-          this.employeeBonusList = await this.$axios.request({
-            url: this.employeeBonusURL
+          this.machineList = await this.$axios.request({
+            url: this.machineURL
           });
           this.getPaginationData(this.pageNum, this.pageSize);
         } catch(e) {
-          this.employeeBonusList = [];
+          this.machineList = [];
           this.paginationData = [];
         }
       },
-      async getItemList() {
-        try {
-          this.itemList = await this.$axios.request({
-            url: BONUS_ITEM,
-            params: {
-              itemType: 1
-            }
-          });
-        } catch(e) {
-          this.itemList = [];
-        }
-      },
-      async getEmployeeList() {
+      async getMachineTypeList() {
         try {
           const deptId = this.deptId;
           if(!deptId) {
             throw new Error("部門為空");
           }
-          this.empList = await this.$axios.request({
-            url: EMPLOYEE,
+          this.machineTypeList = await this.$axios.request({
+            url: MACHINE_TYPE,
             params: {
               deptId
             }
           });
         } catch(e) {
-          this.empList = [];
+          this.machineTypeList = [];
         }
       },
       addAndUpdateBtnHandler(isUpdateOperation) {
@@ -208,27 +168,27 @@
             });
             return null;
           }
-          const { itemId, empId, deptId, dateFrom, value, dateTo } = this.selectedData;
-          this.itemId = itemId;
+          const { machineNo, deptId, isChemicalFiber, machineTypeId, formulaDesc } = this.selectedData;
           this.deptId = deptId;
-          this.value = value;
-          this.date = [dateFrom, dateTo];
-          this.getEmployeeList();
+          this.machineNo = machineNo;
+          this.isChemicalFiber = isChemicalFiber === 1;
+          this.formulaDescription = formulaDesc;
+          this.getMachineTypeList();
           this.$nextTick(function() {
-            this.empId = empId;
+            this.machineTypeId = machineTypeId;
           });
         } else {
-          this.itemId = undefined;
-          this.empId = undefined;
+          this.machineNo = "";
           this.deptId = undefined;
-          this.value = 0;
-          this.date = null;
+          this.machineTypeId = undefined;
+          this.formulaDescription = "";
+          this.isChemicalFiber = false;
         }
         this.isUpdateOperation = isUpdateOperation;
         this.dialogVisible = true;
       },
       async addAndUpdateAxios() {
-        const { itemId, empId, deptId, date, value, isUpdateOperation, employeeBonusURL } = this;
+        const { machineNo, deptId, isChemicalFiber, machineTypeId, isUpdateOperation, machineURL } = this;
         if(!deptId) {
           this.$message({
             message: "部門不允許為空!",
@@ -236,30 +196,16 @@
           });
           return null;
         }
-        if(!empId) {
+        if(machineNo.length === 0) {
           this.$message({
-            message: "員工不允許為空!",
+            message: "機器編號不允許為空!",
             type: "error"
           });
           return null;
         }
-        if(typeof itemId === "undefined") {
+        if(!machineTypeId) {
           this.$message({
-            message: "津貼項不允許為空!",
-            type: "error"
-          });
-          return null;
-        }
-        if(!value) {
-          this.$message({
-            message: "數量不允許為空!",
-            type: "error"
-          });
-          return null;
-        }
-        if(!date) {
-          this.$message({
-            message: "日期不允許為空!",
+            message: "機器類型不允許為空!",
             type: "error"
           });
           return null;
@@ -269,30 +215,28 @@
             return null;
           }
           this.isClick = true;
-          const [dateFrom, dateTo] = date;
           const { request, method } = this.$axios;
-          const url = isUpdateOperation ? `${ employeeBonusURL }/${ this.selectedData.id }` : employeeBonusURL;
+          const url = isUpdateOperation ? `${ machineURL }/${ this.selectedData.id }` : machineURL;
           await request({
             url,
             method: isUpdateOperation ? method.PUT : method.POST,
             data: {
               deptId,
-              empId,
-              itemId,
-              value,
-              dateFrom,
-              dateTo
+              machineNo,
+              isChemicalFiber: isChemicalFiber ? 1 : 0,
+              machineTypeId
             }
           });
           this.$message({
             message: isUpdateOperation ? "更新成功" : "新增成功"
           });
           this.dialogVisible = false;
-          this.getEmployeeBonusList();
+          this.getMachineList();
         } finally {
           this.isClick = false;
         }
       },
+
       sizeChange(size) {
         this.pageSize = size;
         this.getPaginationData(this.pageNum, size);
@@ -302,20 +246,35 @@
         this.getPaginationData(page, this.pageSize);
       },
       getPaginationData(page, size) {
-        this.paginationData = frontEndPagination(this.employeeBonusList, page, size);
+        this.paginationData = frontEndPagination(this.machineList, page, size);
       },
       selectedRow(data) {
         this.selectedData = data;
       },
       deptChange() {
-        this.getEmployeeList();
+        this.getMachineTypeList();
+      },
+      machineTypeChange() {
+        const { machineTypeList, machineTypeId } = this;
+        if(typeof machineTypeId !== "undefined") {
+          const len = machineTypeList.length;
+          for(let i = 0; i < len; i ++) {
+            const item = machineTypeList[i];
+            if(item.id === machineTypeId) {
+              this.formulaDescription = item.formulaDescription;
+            }
+          }
+        }
+      },
+      isChemicalFiberFormatter(row) {
+        return row.isChemicalFiber === 0 ? "否" : "是";
       }
     }
   };
 </script>
 
 <style lang="less" scoped>
-  #employee_bonus_list {
+  #machine_configuration {
     display: flex;
     flex-direction: column;
     height: 100%;

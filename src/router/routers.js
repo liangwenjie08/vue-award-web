@@ -47,6 +47,30 @@ const routers = new Router({
         {
           path: "bonus/employee/bonusList",
           component: () => import("@/views/bonus_management/employee_bonus_list.vue")
+        },
+        {
+          path: "configManagement/assItemConfig",
+          component: () => import("@/views/configuration_management/assess_configuration.vue")
+        },
+        {
+          path: "configManagement/shiftConf",
+          component: () => import("@/views/configuration_management/shift_configuration.vue")
+        },
+        {
+          path: "configManagement/machineConfig",
+          component: () => import("@/views/configuration_management/machine_configuration.vue")
+        },
+        {
+          path: "configManagement/machineType",
+          component: () => import("@/views/configuration_management/machine_type_configuration.vue")
+        },
+        {
+          path: "configManagement/outputType",
+          component: () => import("@/views/configuration_management/output_type_configuration.vue")
+        },
+        {
+          path: "configManagement/holidayConf",
+          component: () => import("@/views/configuration_management/holiday_configuration.vue")
         }
       ]
     }

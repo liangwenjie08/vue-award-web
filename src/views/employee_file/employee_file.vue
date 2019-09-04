@@ -240,7 +240,7 @@
       layout="total, prev, pager, next, sizes"
       @size-change="sizeChange"
       @current-change="pageChange"
-    />
+    ></el-pagination>
     <el-dialog width="65%" :title="`${isUpdateOperation ? (isDetail ? '查看' : '更新') : '新增'}員工信息`"
                :visible.sync="dialogVisible">
       <div class="dialog-row-item">
@@ -381,7 +381,8 @@
       </div>
       <div v-if="!isDetail" slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addAndUpdateEmployee">{{this.isUpdateOperation ? "更 新" : "确 定"}}
+        <el-button style="background-color: #418DCF;" type="primary" @click="addAndUpdateEmployee">
+          {{this.isUpdateOperation ? "更 新" : "确 定"}}
         </el-button>
       </div>
     </el-dialog>
@@ -527,6 +528,7 @@
           }
         } catch(e) {
           this.employeeList = [];
+          this.total = 0;
         }
       },
       //定義部門列表需要的數據結構

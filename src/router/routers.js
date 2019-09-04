@@ -79,6 +79,10 @@ const routers = new Router({
         {
           path: "trainManagement/trainingList",
           component: () => import("@/views/training_management/train_list.vue")
+        },
+        {
+          path: "trainManagement/projectList",
+          component: () => import("@/views/training_management/train_summary.vue")
         }
       ]
     }

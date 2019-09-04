@@ -83,6 +83,10 @@ const routers = new Router({
         {
           path: "trainManagement/projectList",
           component: () => import("@/views/training_management/train_summary.vue")
+        },
+        {
+          path: "position/list",
+          component: () => import("@/views/textile_position_management/textile_position_list.vue")
         }
       ]
     }

@@ -29,6 +29,7 @@ import axios from "@/utils/axios";
 import FileUpload from "@/components/FileUpload";
 import FileDownload from "@/components/FileDownload";
 import Delete from "@/components/Delete";
+import BatchDelete from "@/components/BatchDelete";
 import Department from "@/components/Department";
 import TextileDepartment from "@/components/TextileDepartment.vue";
 
@@ -56,6 +57,7 @@ Vue.component("file-download", FileDownload);
 Vue.component("delete-button", Delete);
 Vue.component("department", Department);
 Vue.component("textile-department", TextileDepartment);
+Vue.component("batch-delete-button", BatchDelete);
 
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);

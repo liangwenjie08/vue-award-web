@@ -32,5 +32,6 @@
   .e-menu {
     border: none;
     width: 210px;
+    height: 100%;
   }
 </style>

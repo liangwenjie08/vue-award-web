@@ -508,7 +508,7 @@
     }
 
     .table {
-      height: 100%;
+      height: calc(100% - 121px);
     }
 
     .dialog-row-item {

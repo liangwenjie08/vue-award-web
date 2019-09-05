@@ -97,7 +97,7 @@
         </div>
       </div>
     </div>
-    <div style="height: 100%;">
+    <div class="table">
       <table-box @selection-change="multipleSelectedRow" @current-change="singleSelectedRow" highlight-current-row
                  :data="employeeList">
         <el-table-column
@@ -1057,6 +1057,10 @@
           margin-left: 5px;
         }
       }
+    }
+
+    .table {
+      height: calc(100% - 163px);
     }
 
     .dialog-row-item {

@@ -17,7 +17,7 @@
 <style lang="less" scoped>
   #layout {
     height: 100%;
-    width: 100%;
+    /*width: 100%;*/
 
     #layout-header {
       display: flex;
@@ -35,8 +35,10 @@
 
     #nav {
       flex: 0 0 210px;
-      overflow: hidden auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 0 0 3px 2px gray;
+      height: 100%;
     }
 
     #content {

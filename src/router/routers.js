@@ -91,6 +91,10 @@ const routers = new Router({
         {
           path: "switch/list",
           component: () => import("@/views/switch_management/switch_list.vue")
+        },
+        {
+          path: "switch",
+          component: () => import("@/views/switch_management/switch_insert.vue")
         }
       ]
     }

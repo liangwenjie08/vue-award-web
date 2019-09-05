@@ -127,8 +127,8 @@
         doLayout: true,
         //查询参数
         deptId: 49,
-        startDate: "2018-08-01",                   //today.format("yyyy-MM-dd"),
-        endDate: "2019-09-05",                      //null,
+        startDate: today.format("yyyy-MM-dd"),
+        endDate: null,
         shift: undefined,
         empId: "",
         task: "",
@@ -218,7 +218,7 @@
     }
 
     .table {
-      height: 100%;
+      height: calc(100% - 80px);
     }
   }
 </style>

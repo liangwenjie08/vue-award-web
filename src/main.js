@@ -33,6 +33,7 @@ import Delete from "@/components/Delete";
 import BatchDelete from "@/components/BatchDelete";
 import Department from "@/components/Department";
 import TextileDepartment from "@/components/TextileDepartment.vue";
+import TableAndFormLayout from "@/components/layout/TableAndFormLayout.vue";
 
 Vue.use(Pagination);
 Vue.use(Button);
@@ -60,6 +61,7 @@ Vue.component("delete-button", Delete);
 Vue.component("department", Department);
 Vue.component("textile-department", TextileDepartment);
 Vue.component("batch-delete-button", BatchDelete);
+Vue.component("table-form-layout", TableAndFormLayout);
 
 Vue.prototype.$ELEMENT = { size: "small" };
 Vue.component("table-box", TableBox);

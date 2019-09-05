@@ -21,7 +21,8 @@ import {
   Popover,
   Dialog,
   Radio,
-  RadioGroup
+  RadioGroup,
+  Tooltip
 } from "element-ui";
 import TableBox from "@/components/TableBox";
 import { message, loading, notification } from "@/utils/utility_class";
@@ -50,6 +51,7 @@ Vue.use(RadioGroup);
 Vue.use(Checkbox);
 Vue.use(Popover);
 Vue.use(Dialog);
+Vue.use(Tooltip);
 
 Vue.component("treeselect", Treeselect);
 Vue.component("file-upload", FileUpload);

@@ -122,7 +122,6 @@
         workContentList: [],
         selectedData: null,
         multipleSelectedData: [],
-        loading: false,
         pageNum: 1,
         pageSize: default_page_size,
         total: 0,

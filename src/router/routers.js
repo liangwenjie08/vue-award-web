@@ -87,6 +87,10 @@ const routers = new Router({
         {
           path: "position/list",
           component: () => import("@/views/textile_position_management/textile_position_list.vue")
+        },
+        {
+          path: "switch/list",
+          component: () => import("@/views/switch_management/switch_list.vue")
         }
       ]
     }

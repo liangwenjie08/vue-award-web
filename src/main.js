@@ -6,6 +6,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import {
   Button,
+  ButtonGroup,
   Input,
   InputNumber,
   Menu,
@@ -53,6 +54,7 @@ Vue.use(Checkbox);
 Vue.use(Popover);
 Vue.use(Dialog);
 Vue.use(Tooltip);
+Vue.use(ButtonGroup);
 
 Vue.component("treeselect", Treeselect);
 Vue.component("file-upload", FileUpload);

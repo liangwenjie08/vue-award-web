@@ -25,7 +25,7 @@
               确定
             </el-button>
           </div>
-          <el-button :loading="loading" slot="reference" style="background-color: red;outline: none;" type="primary"
+          <el-button slot="reference" style="background-color: red;outline: none;" type="primary"
                      icon="el-icon-delete-solid">
             刪除
           </el-button>
@@ -145,7 +145,8 @@
       </div>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button style="background-color: #418DCF;" type="primary" @click="addConfirmAxios">
+        <el-button :disabled="loading" :loading="loading" style="background-color: #418DCF;" type="primary"
+                   @click="addConfirmAxios">
           确 定
         </el-button>
       </div>
@@ -167,6 +168,7 @@
         selectedData: null,
         multipleSelectedData: [],
         loading: false,
+        doLayout: true,
         pageNum: 1,
         pageSize: default_page_size,
         total: 0,
@@ -224,6 +226,12 @@
           this.pageNum = res.pageNum;
           this.pageSize = res.pageSize;
           this.total = res.total;
+          if(this.doLayout && res.list.length > 0) {
+            this.$nextTick(function() {
+              this.$refs.tableBoxRef.doLayout();
+            });
+            this.doLayout = false;
+          }
         } catch(e) {
           this.trainSummaryList = [];
           this.total = 0;
@@ -297,6 +305,7 @@
             return null;
           }
           this.isClick = true;
+          this.loading = true;
           const url = isUpdateOperation ? `${ TRAIN_SUMMARY }/${ this.selectedData.id }` : TRAIN_SUMMARY;
           const { request, method } = this.$axios;
           await request({
@@ -319,6 +328,7 @@
           this.dialogVisible = false;
           this.getTrainSummaryList();
         } finally {
+          this.loading = false;
           this.isClick = false;
         }
       },

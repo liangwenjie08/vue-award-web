@@ -6,26 +6,10 @@
                    icon="el-icon-plus">
           增加
         </el-button>
-        <el-popover
-          placement="top"
-          width="160"
-          v-model="deleteConfirmVisible"
-          style="margin-left: 10px;margin-right: 10px;">
-          <p>
-            确定删除吗？
-          </p>
-          <div style="text-align: right; margin: 0">
-            <el-button type="text" @click="deleteConfirmVisible = false">取消</el-button>
-            <el-button type="primary" style="background-color: red;margin-left: 20px;" size="mini"
-                       @click="deleteConfirm">
-              确定
-            </el-button>
-          </div>
-          <el-button :loading="loading" slot="reference" style="background-color: red;outline: none;" type="primary"
-                     icon="el-icon-delete-solid">
-            刪除
-          </el-button>
-        </el-popover>
+        <batch-delete-button :selectedData="multipleSelectedData" :url="batchDeleteURL" :delete-callback="getTrainList"
+                             id-key="id"></batch-delete-button>
+        <file-download style="margin-left: 25px;" :url="downloadExcel" description="導出"
+                       :params="params"></file-download>
       </div>
       <div class="header-search">
         <textile-department @input="getTrainList" style="width: 160px;" v-model="searchDeptId"></textile-department>
@@ -46,11 +30,11 @@
       </div>
     </div>
     <div class="table">
-      <table-box :data="trainList">
+      <table-box @selection-change="selectionChange" :data="trainList">
         <el-table-column
           type="selection"
           width="35"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="90"
           prop="employeeId"
@@ -122,12 +106,14 @@
           prop="evaluatorDate"
           label="评估日期"
           align="center"
+          :formatter="evaluatorDateFormatter"
         ></el-table-column>
         <el-table-column
           min-width="90"
           prop="employeeJoinDate"
           label="進廠日期"
           align="center"
+          :formatter="employeeJoinDateFormatter"
         ></el-table-column>
       </table-box>
     </div>
@@ -235,7 +221,7 @@
 </template>
 
 <script>
-  import { EMPLOYEE, PROJECT, TRAIN, TRAIN_PROJECT } from "@/api/train";
+  import { EMPLOYEE, PROJECT, TRAIN, TRAIN_PROJECT, DELETE_LIST_BATCH, LIST_DOWNLOAD_EXCEL } from "@/api/train";
   import { default_page_size } from "@/utils/common_variable";
 
   export default {
@@ -252,6 +238,8 @@
         pageSize: default_page_size,
         total: 0,
         dialogVisible: false,
+        doLayout: true,
+        multipleSelectedData: [],
         //查詢參數
         searchDeptId: undefined,
         searchProjectId: undefined,
@@ -272,6 +260,26 @@
         deptId: undefined,
         selectedEmployeeList: []
       };
+    },
+    computed: {
+      batchDeleteURL() {
+        return DELETE_LIST_BATCH;
+      },
+      downloadExcel() {
+        return LIST_DOWNLOAD_EXCEL;
+      },
+      params() {
+        const { searchDeptId, searchProjectId, searchEmpId, searchDate } = this;
+        const [startDate, endDate] = searchDate || [];
+        const employeeId = searchEmpId.trim().length === 0 ? undefined : searchEmpId;
+        return {
+          deptId: searchDeptId,
+          trainProjectId: searchProjectId,
+          empId: employeeId,
+          startDate,
+          endDate
+        };
+      }
     },
     created() {
       this.getTrainList();
@@ -299,6 +307,12 @@
           this.pageNum = res.pageNum;
           this.pageSize = res.pageSize;
           this.total = res.total;
+          if(this.doLayout && res.list.length > 0) {
+            this.$nextTick(function() {
+              this.$refs.tableBoxRef.doLayout();
+            });
+            this.doLayout = false;
+          }
         } catch(e) {
           this.trainList = [];
           this.total = 0;
@@ -467,12 +481,21 @@
       },
       sizeChange(size) {
         this.pageSize = size;
-        this.$nextTick(this.getTrainList);
+        this.getTrainList();
       },
       pageChange(page) {
         this.pageNum = page;
-        this.$nextTick(this.getTrainList);
+        this.getTrainList();
       },
+      evaluatorDateFormatter(row) {
+        return row.evaluatorDate ? new Date(row.evaluatorDate).format("yyyy-MM-dd") : "";
+      },
+      employeeJoinDateFormatter(row) {
+        return row.employeeJoinDate ? new Date(row.employeeJoinDate).format("yyyy-MM-dd") : "";
+      },
+      selectionChange(selection) {
+        this.multipleSelectedData = selection;
+      }
     }
   };
 </script>
@@ -487,6 +510,7 @@
       display: flex;
       flex-direction: column;
       padding-bottom: 15px;
+      min-width: 815px;
 
       .header-layout {
         display: flex;

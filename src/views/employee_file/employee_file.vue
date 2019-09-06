@@ -1,6 +1,9 @@
 <template>
   <div id="employee_file">
     <div class="header">
+      <div class="header-statistics">
+        <span style="margin-left: 10px;" v-for="item of statisticsList">{{ `${item.functionDeptName}：${item.empStaff}` }}</span>
+      </div>
       <div class="header-button">
         <el-button @click="addAndUpdateHandler(false, false)" style="background-color: #5CB85C;" type="primary"
                    icon="el-icon-plus">增加
@@ -12,9 +15,13 @@
           width="160"
           v-model="deleteConfirmVisible"
           style="margin-left: 10px;margin-right: 10px;">
-          <p>确定删除<strong>{{
-                         multipleChoiceFlag ? "右側展示的人" : singleSelectedData !== null ? singleSelectedData.empName : ""
-                         }}</strong>吗？
+          <p>
+            确定删除
+            <strong>
+              {{
+              multipleChoiceFlag ? "右側展示的人" : singleSelectedData !== null ? singleSelectedData.empName : ""
+              }}
+            </strong>吗？
           </p>
           <div style="text-align: right; margin: 0">
             <el-button type="text" @click="deleteConfirmVisible = false">取消</el-button>
@@ -56,21 +63,23 @@
             placeholder="部門"
             @input="getEmployeeList"
             :defaultExpandLevel="3"
-          />
-          <el-input @keyup.enter.native="getEmployeeList" v-model="deptDesc" class="left-distance"
-                    style="width: 130px;" placeholder="部門模糊查詢" clearable />
+          ></treeselect>
+          <el-input @clear="getEmployeeList" @keyup.enter.stop.native="getEmployeeList" v-model="deptDesc"
+                    class="left-distance"
+                    style="width: 130px;" placeholder="部門模糊查詢" clearable></el-input>
           <el-select @change="getEmployeeList()" class="left-distance" style="width: 120px;"
                      placeholder="離職原因" v-model="searchResignReason" clearable>
             <el-option
               v-for="item of leaveReasonList"
               :key="item"
               :value="item"
-            />
+            ></el-option>
           </el-select>
-          <el-input @keyup.enter.native="getEmployeeList" v-model="searchEmpId" clearable
-                    class="left-distance" style="width: 120px;" placeholder="工號" />
-          <el-input @keyup.enter.native="getEmployeeList" v-model="searchEmpName" clearable
-                    class="left-distance" style="width: 100px;" placeholder="姓名" />
+          <el-input @clear="getEmployeeList" @keyup.enter.stop.native="getEmployeeList" v-model="searchEmpId" clearable
+                    class="left-distance" style="width: 120px;" placeholder="工號"></el-input>
+          <el-input @clear="getEmployeeList" @keyup.enter.stop.native="getEmployeeList" v-model="searchEmpName"
+                    clearable
+                    class="left-distance" style="width: 100px;" placeholder="姓名"></el-input>
           <el-select @change="getEmployeeList" class="left-distance" style="width: 120px;"
                      placeholder="職務狀態" v-model="searchIsOnjob" clearable>
             <el-option
@@ -78,7 +87,7 @@
               :key="item.value"
               :value="item.value"
               :label="item.lable"
-            />
+            ></el-option>
           </el-select>
         </div>
         <div class="header-search-bottom">
@@ -87,12 +96,12 @@
                           value-format="yyyy-MM-dd" :validate-event="false" range-separator="至"
                           start-placeholder="入職開始日期"
                           end-placeholder="入職結束日期" style="width: 270px;" :picker-options="datePickerOptions"
-          />
+          ></el-date-picker>
           <el-date-picker class="left-distance" @change="getEmployeeList" v-model="searchLeaveDate" format="yyyyMMdd"
                           type="daterange" clearable value-format="yyyy-MM-dd" :validate-event="false"
                           range-separator="至" start-placeholder="離職開始日期" end-placeholder="離職結束日期" style="width: 270px;"
                           :picker-options="datePickerOptions"
-          />
+          ></el-date-picker>
           <el-checkbox style="margin-left: 20px;" v-model="multipleChoiceFlag">多選</el-checkbox>
         </div>
       </div>
@@ -103,21 +112,24 @@
         <el-table-column
           type="selection"
           width="40"
-        />
+        ></el-table-column>
         <el-table-column
           prop="empId"
           label="工號"
           width="85"
           fixed="left"
           align="center"
-        />
+          sortable
+        ></el-table-column>
         <el-table-column
           prop="empName"
           label="姓名"
           width="100"
           fixed="left"
           align="center"
-        />
+          sortable
+          :sort-method="empNameSort"
+        ></el-table-column>
         <el-table-column
           prop="deptDesc"
           label="部門"
@@ -125,110 +137,122 @@
           fixed="left"
           show-overflow-tooltip
           align="center"
-        />
+          sortable
+          :sort-method="deptDescSort"
+        ></el-table-column>
         <el-table-column
           prop="shift"
           label="班別"
-          width="50"
+          width="70"
           align="center"
-        />
+          sortable
+        ></el-table-column>
         <el-table-column
           prop="jobTitle"
           label="職務"
           width="80"
           show-overflow-tooltip
           align="center"
-        />
+          sortable
+          :sort-method="jobTitleSort"
+        ></el-table-column>
         <el-table-column
           prop="posDesc"
           label="崗位"
           width="90"
           align="center"
-        />
+          sortable
+          :sort-method="posDescSort"
+        ></el-table-column>
         <el-table-column
           prop="gender"
           label="性別"
-          width="50"
+          width="70"
           align="center"
           :formatter="genderFormatter"
-        />
+          sortable
+        ></el-table-column>
         <el-table-column
           prop="age"
           label="年齡"
           width="50"
           align="center"
           :formatter="ageFormatter"
-        />
+        ></el-table-column>
         <el-table-column
           prop="height"
           label="身高"
           width="50"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           prop="academic"
           label="學歷"
           width="50"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           prop="domicilePlace"
           label="戶籍"
-          width="80"
+          width="90"
           align="center"
-        />
+          sortable
+          :sort-method="domicilePlaceSort"
+        ></el-table-column>
         <el-table-column
           prop="birthday"
           label="出生日期"
-          width="90"
+          width="100"
           align="center"
-        />
+          sortable
+        ></el-table-column>
         <el-table-column
           prop="joinDate"
           label="入職日期"
-          width="90"
+          width="100"
           align="center"
-        />
+          sortable
+        ></el-table-column>
         <el-table-column
           prop="leaveDate"
           label="離職日期"
           width="90"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           prop="isOnjob"
           label="在職"
-          width="45"
+          width="50"
           align="center"
           :formatter="isOnjobFormatter"
-        />
+        ></el-table-column>
         <el-table-column
           prop="resignReason"
           label="離職原因"
           width="100"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           prop="phone"
           label="手機號碼"
           width="90"
           align="center"
           :formatter="phoneFormatter"
-        />
+        ></el-table-column>
         <el-table-column
           prop="idCard"
           label="身份證"
           width="110"
           align="center"
           :formatter="idCardFormatter"
-        />
+        ></el-table-column>
         <el-table-column
           prop="description"
           label="備註"
           min-width="180"
           align="center"
           show-overflow-tooltip
-        />
+        ></el-table-column>
       </table-box>
     </div>
     <el-pagination
@@ -262,7 +286,7 @@
             placeholder="部門"
             :defaultExpandLevel="3"
             @input="deptChange"
-          />
+          ></treeselect>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">崗位</span>
@@ -293,7 +317,7 @@
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">身份證</span>
-          <el-input v-model="idCard" placeholder="身份證"></el-input>
+          <el-input @keyup.enter.stop.native="getIdCardMsg" v-model="idCard" placeholder="身份證"></el-input>
         </div>
       </div>
       <div class="dialog-row-item">
@@ -381,7 +405,7 @@
       </div>
       <div v-if="!isDetail" slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button style="background-color: #418DCF;" type="primary" @click="addAndUpdateEmployee">
+        <el-button :disabled="loading" :loading="loading" style="background-color: #418DCF;" type="primary" @click="addAndUpdateEmployee">
           {{this.isUpdateOperation ? "更 新" : "确 定"}}
         </el-button>
       </div>
@@ -391,15 +415,18 @@
 
 <script>
   import {
+    DOWLOAD_EXCEL,
+    DOWLOAD_TEMPLATE,
+    DOWNLOAD_PDF,
     EMPLOYEE,
     SEARCH_DEPARTMENT_LIST,
-    DOWLOAD_TEMPLATE,
-    DOWLOAD_EXCEL,
-    DOWNLOAD_PDF,
-    UPLOAD_FILE
+    STATISTICS_INFO,
+    UPLOAD_FILE,
+    IDCARD_INFO
   } from "@/api/employee_file";
   import { default_page_size } from "@/utils/common_variable";
   import { disabledDate } from "@/utils/utility_class";
+  import findChineseSpell from "@/utils/chineseCharacter";
 
   export default {
     name: "employee_file",
@@ -407,6 +434,7 @@
       return {
         //是否已经执行了操作
         isClick: false,
+        loading: false,
         templateDownloadLoading: false,
         excelDownloadLoading: false,
         pdfDownloadLoading: false,
@@ -418,6 +446,7 @@
         //头部搜索部门列表
         deptList: [],
         posList: [],
+        statisticsList: [],
         //离职原因列表
         leaveReasonList: ["解僱", "有身孕", "自動離職", "有事回家", "身體不適", "工作壓力大"],
         //是否在職列表
@@ -484,6 +513,7 @@
     created() {
       this.getEmployeeList();
       this.getDeptList();
+      this.getStatisticsList();
     },
     methods: {
       async getEmployeeList() {
@@ -498,7 +528,6 @@
         try {
           const res = await this.$axios.request({
             url: EMPLOYEE,
-            method: this.$axios.method.GET,
             params: {
               isAdditional: true,
               status: 1,
@@ -520,12 +549,14 @@
           this.total = res.total;
           this.pageNum = res.pageNum;
           this.pageSize = res.pageSize;
-          if(this.doLayout) {
+          if(this.doLayout && res.list.length > 0) {
             this.$nextTick(function() {
               this.$refs.tableBoxRef.doLayout();
             });
             this.doLayout = false;
           }
+          //获取统计信息
+          this.getStatisticsList();
         } catch(e) {
           this.employeeList = [];
           this.total = 0;
@@ -560,6 +591,65 @@
                 this.getPosList(item.children, deptId);
               }
             }
+          }
+        }
+      },
+      async getStatisticsList() {
+        //请求参数
+        const {
+          pageNum = 1, pageSize = default_page_size, searchDeptId: deptId = 49, deptDesc,
+          searchResignReason: resignReason, searchIsOnjob: isOnjob, searchEmpId: empId,
+          searchEmpName: empName, searchJoinDate: joinDate, searchLeaveDate: leaveDate
+        } = this;
+        const [joinStartDate, joinEndDate] = joinDate || [];
+        const [leaveStartDate, leaveEndDate] = leaveDate || [];
+        try {
+          this.statisticsList = await this.$axios.request({
+            url: STATISTICS_INFO,
+            params: {
+              isAdditional: true,
+              status: 1,
+              pageNum,
+              pageSize,
+              deptId,
+              deptDesc,
+              resignReason,
+              isOnjob,
+              empId,
+              empName,
+              joinStartDate,
+              joinEndDate,
+              leaveStartDate,
+              leaveEndDate
+            }
+          });
+        } catch(e) {
+          this.statisticsList = [];
+        }
+      },
+      async getIdCardMsg() {
+        const idCard = this.idCard.trim();
+        if(idCard.length === 0) {
+          this.$message({
+            message: "請輸入身份證!",
+            type: "error"
+          });
+        } else {
+          const isIdLegal = this.testid(idCard);
+          if(isIdLegal) {
+            const url = IDCARD_INFO + "/" + idCard;
+            const res = await this.$axios.request({
+              url
+            });
+            this.domicilePlace = res.base1;
+            this.birthday = res.birthday;
+            this.gender = res.gender === "女" ? "0" : "1";
+            console.log(res);
+          } else {
+            this.$message({
+              message: "身份證不合法!",
+              type: "error"
+            });
           }
         }
       },
@@ -680,43 +770,6 @@
         } finally {
           this.isClick = false;
         }
-      },
-      ageFormatter(row) {
-        let age = undefined;
-        if(row.birthday) {
-          const birthdayDate = new Date(row.birthday);
-          const year = birthdayDate.getFullYear();
-          age = this.nowYear - year;
-        }
-        return age;
-      },
-      genderFormatter(row) {
-        let gender = "";
-        if(row.gender) {
-          gender = row.gender === "1" ? "男" : "女";
-        }
-        return gender;
-      },
-      isOnjobFormatter(row) {
-        let isOnjob = "";
-        if(typeof row.isOnjob === "number") {
-          isOnjob = row.isOnjob === 1 ? "是" : "否";
-        }
-        return isOnjob;
-      },
-      phoneFormatter(row) {
-        let phone = "";
-        if(row.phone) {
-          phone = this.stringToStar(row.phone, 3, 4);
-        }
-        return phone;
-      },
-      idCardFormatter(row) {
-        let idCard = "";
-        if(row.idCard) {
-          idCard = this.stringToStar(row.idCard, 3, 6);
-        }
-        return idCard;
       },
       stringToStar(str, startLen, endLen) {
         const startStr = str.substr(0, startLen);
@@ -858,6 +911,7 @@
           return null;
         }
         this.isClick = true;
+        this.loading = true;
         try {
           const isUpdateOperation = this.isUpdateOperation;
           let leaveDateParam = leaveDate;
@@ -901,6 +955,7 @@
           this.dialogVisible = false;
         } finally {
           this.isClick = false;
+          this.loading = false;
         }
       },
       //验证身份证
@@ -1021,7 +1076,69 @@
           this.isClick = false;
           this.pdfDownloadLoading = false;
         }
-      }
+      },
+      empNameSort(a, b) {
+        const ai = findChineseSpell(a.empName);
+        const bi = findChineseSpell(b.empName);
+        return ai - bi;
+      },
+      deptDescSort(a, b) {
+        const ai = findChineseSpell(a.deptDesc);
+        const bi = findChineseSpell(b.deptDesc);
+        return ai - bi;
+      },
+      jobTitleSort(a, b) {
+        const ai = findChineseSpell(a.jobTitle);
+        const bi = findChineseSpell(b.jobTitle);
+        return ai - bi;
+      },
+      posDescSort(a, b) {
+        const ai = findChineseSpell(a.posDesc);
+        const bi = findChineseSpell(b.posDesc);
+        return ai - bi;
+      },
+      domicilePlaceSort(a, b) {
+        const ai = findChineseSpell(a.domicilePlace);
+        const bi = findChineseSpell(b.domicilePlace);
+        return ai - bi;
+      },
+      ageFormatter(row) {
+        let age = undefined;
+        if(row.birthday) {
+          const birthdayDate = new Date(row.birthday);
+          const year = birthdayDate.getFullYear();
+          age = this.nowYear - year;
+        }
+        return age;
+      },
+      genderFormatter(row) {
+        let gender = "";
+        if(row.gender) {
+          gender = row.gender === "1" ? "男" : "女";
+        }
+        return gender;
+      },
+      isOnjobFormatter(row) {
+        let isOnjob = "";
+        if(typeof row.isOnjob === "number") {
+          isOnjob = row.isOnjob === 1 ? "是" : "否";
+        }
+        return isOnjob;
+      },
+      phoneFormatter(row) {
+        let phone = "";
+        if(row.phone) {
+          phone = this.stringToStar(row.phone, 3, 4);
+        }
+        return phone;
+      },
+      idCardFormatter(row) {
+        let idCard = "";
+        if(row.idCard) {
+          idCard = this.stringToStar(row.idCard, 3, 6);
+        }
+        return idCard;
+      },
     }
   };
 </script>
@@ -1035,20 +1152,30 @@
 
     .header {
       padding: 0 0 15px 0;
+      min-width: 800px;
+
+      .header-statistics {
+        display: flex;
+        flex-flow: row wrap;
+        height: 42px;
+        padding-bottom: 10px;
+      }
 
       .header-button {
+        display: flex;
+        flex-flow: row nowrap;
         padding-bottom: 10px;
       }
 
       .header-search {
         .header-search-top {
           display: flex;
-          flex-flow: row wrap;
+          flex-flow: row nowrap;
         }
 
         .header-search-bottom {
           display: flex;
-          flex-flow: row wrap;
+          flex-flow: row nowrap;
           align-items: center;
           padding-top: 10px;
         }
@@ -1060,7 +1187,7 @@
     }
 
     .table {
-      height: calc(100% - 163px);
+      height: calc(100% - 215px);
     }
 
     .dialog-row-item {

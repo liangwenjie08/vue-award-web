@@ -10,3 +10,7 @@ export const DOWLOAD_EXCEL = "/v2/employee/export";
 export const DOWNLOAD_PDF = "/v2/employee/export-resign";
 //批量上傳
 export const UPLOAD_FILE = "/v2/employee/import";
+//员工统计信息
+export const STATISTICS_INFO = "/v2/employee/emp-staff";
+//通过ID获取信息
+export const IDCARD_INFO = "/v2/employee/idcard/";

@@ -1,7 +1,12 @@
 <template functional>
-  <div id="table-form-layout">
+  <div v-bind="data.attrs" id="table-form-layout">
     <div class="table-layout">
-      <slot name="table"></slot>
+      <div class="table">
+        <slot name="table"></slot>
+      </div>
+      <div class="pagination">
+        <slot name="pagination"></slot>
+      </div>
     </div>
     <div class="form-layout">
       <slot name="form"></slot>
@@ -9,16 +14,24 @@
   </div>
 </template>
 
-<style lang="less" scoped>
+<style lang="less">
   #table-form-layout {
     display: flex;
-    height: calc(100% - 50px);
+    /*height: calc(100% - 50px);*/
     flex-flow: row nowrap;
 
     .table-layout {
       width: calc(100% - 250px);
       margin-right: 10px;
       height: 100%;
+
+      .table {
+        height: calc(100% - 32px);
+      }
+
+      .pagination {
+        height: 32px;
+      }
     }
 
     .form-layout {

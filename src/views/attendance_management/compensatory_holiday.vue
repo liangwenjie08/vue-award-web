@@ -26,29 +26,21 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="60"
-          prop="shift"
-          label="班次"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          min-width="100"
+          min-width="140"
           prop="restStartTime"
-          label="休息日期"
+          label="開始休息"
           align="center"
-          :formatter="restStartTimeFormatter"
         ></el-table-column>
         <el-table-column
-          min-width="100"
-          prop="workStartTime"
-          label="工作日期"
+          min-width="140"
+          prop="restEndTime"
+          label="結束休息"
           align="center"
-          :formatter="workStartTimeFormatter"
         ></el-table-column>
         <el-table-column
-          min-width="80"
-          prop="code"
-          label="類型"
+          min-width="50"
+          prop="restTime"
+          label="小計"
           align="center"
         ></el-table-column>
         <el-table-column
@@ -84,24 +76,27 @@
           <el-input readonly v-model="empName" placeholder="員工姓名"></el-input>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">工作日期</span>
-          <el-date-picker @keyup.enter.stop.native v-model="workDate" value-format="yyyy-MM-dd HH:mm:ss"
+          <span class="span-distance">日期</span>
+          <el-date-picker @keyup.enter.stop.native v-model="date" value-format="yyyy-MM-dd HH:mm:ss"
                           format="yyyyMMdd" style="width: 100%;" placeholder="工作日期"></el-date-picker>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">休息日期</span>
-          <el-date-picker @keyup.enter.stop.native v-model="restDate" value-format="yyyy-MM-dd HH:mm:ss"
-                          format="yyyyMMdd" style="width: 100%;" placeholder="休息日期"></el-date-picker>
+          <span class="span-distance">時間由</span>
+          <el-time-picker arrow-control placeholder="開始時間" format="HHmm" value-format="HH:mm:ss"
+                          @keyup.enter.stop.native v-model="startTime"></el-time-picker>
+          <!--          <el-time-select @keyup.enter.stop.native v-model="startTime" value-format="HH:mm:ss"-->
+          <!--                          format="HHmmss" style="width: 100%;" placeholder="開始時間"></el-time-select>-->
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">班次</span>
-          <el-input v-model="shift" placeholder="班次"></el-input>
+          <span class="span-distance">至</span>
+          <el-time-picker arrow-control placeholder="結束時間" format="HHmm" value-format="HH:mm:ss"
+                          @keyup.enter.stop.native v-model="endTime"></el-time-picker>
+          <!--          <el-time-select @keyup.enter.stop.native v-model="endTime" value-format="HH:mm:ss"-->
+          <!--                          format="HHmm" style="width: 100%;" placeholder="休息日期"></el-time-select>-->
         </div>
         <div class="dialog-cell-item">
-          <el-radio-group v-model="code">
-            <el-radio label="1">正常調休</el-radio>
-            <el-radio label="2">僅休息</el-radio>
-          </el-radio-group>
+          <span class="span-distance">小計</span>
+          <el-input v-model="restTime" placeholder="小計"></el-input>
         </div>
         <div class="dialog-cell-item">
           <el-button :loading="loading" :disabled="loading" @click="addAndUpdateAxios" type="primary"
@@ -119,7 +114,7 @@
   import { default_page_size } from "@/utils/common_variable";
 
   export default {
-    name: "adjust_holiday",
+    name: "compensatory_holiday",
     props: ["params"],
     data() {
       return {
@@ -131,17 +126,16 @@
         doLayout: true,
         isUpdateOperation: false,
         loading: false,
-        //員工是否存在
         empIsExist: false,
         //添加和更新請求參數
         id: undefined,
         empId: "",
         empName: "",
-        workDate: null,
-        restDate: null,
-        shift: "",
-        //調休類型
-        code: "1"
+        date: null,
+        startTime: null,
+        endTime: null,
+        //小計
+        restTime: ""
       };
     },
     watch: {
@@ -163,7 +157,7 @@
           const res = await this.$axios.request({
             url: FORM,
             params: {
-              type: 0,
+              type: 2,
               deptId: searchDeptId,
               empId,
               startDate,
@@ -208,67 +202,39 @@
         }
       },
       async addAndUpdateAxios() {
-        const { empIsExist, empId, workDate, restDate, shift, code, id, $message, isUpdateOperation } = this;
-        if(!empIsExist) {
-          $message({
-            message: "請先輸入員工!",
-            type: "error"
-          });
-          return;
-        }
-        if(!workDate) {
-          $message({
-            message: "工作日期不允許為空!",
-            type: "error"
-          });
-          return;
-        }
-        if(!restDate) {
-          $message({
-            message: "休息日期不允許為空!",
-            type: "error"
-          });
-          return;
-        }
-        if(this.loading) {
-          return;
-        }
-        try {
-          this.loading = true;
-          const { request, method } = this.$axios;
-          await request({
-            url: FORM,
-            method: isUpdateOperation ? method.PUT : method.POST,
-            data: {
-              empId,
-              id,
-              restStartTime: restDate,
-              workStartTime: workDate,
-              shift,
-              code,
-              type: 0
-            }
-          });
-          $message({
-            message: isUpdateOperation ? "更新成功" : "新增成功"
-          });
-          this.getTableData();
-          this.reset();
-        } finally {
-          this.loading = false;
-        }
+
       },
       reset() {
-        this.empIsExist = false;
         this.isUpdateOperation = false;
+        this.empIsExist = false;
         this.singleSelectedData = null;
         this.id = undefined;
-        this.code = "1";
         this.empId = "";
         this.empName = "";
-        this.restDate = null;
-        this.workDate = null;
-        this.shift = "";
+        this.date = null;
+        this.startTime = null;
+        this.endTime = null;
+        this.restTime = "";
+      },
+      singleSelectedRow(selectedData) {
+        if(this.singleSelectedData === selectedData) {
+          this.reset();
+        } else {
+          this.isUpdateOperation = true;
+          this.empIsExist = true;
+          this.singleSelectedData = selectedData;
+          this.id = selectedData.id;
+          this.empId = selectedData.empId;
+          this.empName = selectedData.empName;
+          const { restEndTime, restStartTime } = selectedData;
+          this.date = restStartTime.split(" ")[0];
+          this.startTime = restStartTime.split(" ")[1];
+          this.endTime = restEndTime.split(" ")[1];
+          this.restTime = selectedData.restTime;
+        }
+      },
+      multipleSelectedRow(selectedData) {
+        this.$emit("multiple-selected", selectedData);
       },
       sizeChange(size) {
         this.pageSize = size;
@@ -277,31 +243,6 @@
       pageChange(page) {
         this.pageNum = page;
         this.getTableData();
-      },
-      multipleSelectedRow(selectedData) {
-        this.$emit("multiple-selected", selectedData);
-      },
-      singleSelectedRow(selectedData) {
-        if(selectedData === this.singleSelectedData) {
-          this.reset();
-        } else {
-          this.empIsExist = true;
-          this.isUpdateOperation = true;
-          this.singleSelectedData = selectedData;
-          this.id = selectedData.id;
-          this.code = selectedData.code;
-          this.empId = selectedData.empId;
-          this.empName = selectedData.empName;
-          this.restDate = selectedData.restStartTime;
-          this.workDate = selectedData.workStartTime;
-          this.shift = selectedData.shift;
-        }
-      },
-      restStartTimeFormatter(row) {
-        return row.restStartTime.split(" ")[0];
-      },
-      workStartTimeFormatter(row) {
-        return row.workStartTime.split(" ")[0];
       },
       createTimeFormatter(row) {
         return row.createTime.split(" ")[0];

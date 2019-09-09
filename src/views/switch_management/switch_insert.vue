@@ -21,7 +21,7 @@
         <el-button type="primary" style="background-color: #418DCF;">提交</el-button>
       </div>
     </div>
-    <table-form-layout style="height: calc(100% - 80px);">
+    <table-form-layout :style.native="{height: 'calc(100% - 50px)'}">
       <template #table>
         <table-box @current-change="currentChange" :data="switchEmployeeList" highlight-current-row>
           <el-table-column
@@ -327,10 +327,6 @@
       .left-distance {
         margin-left: 10px;
       }
-    }
-
-    .table {
-      height: 100%;
     }
 
     .form {

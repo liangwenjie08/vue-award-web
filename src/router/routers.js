@@ -95,6 +95,10 @@ const routers = new Router({
         {
           path: "switch",
           component: () => import("@/views/switch_management/switch_insert.vue")
+        },
+        {
+          path: "attendanceManagement/form",
+          component: () => import("@/views/attendance_management/layout.vue")
         }
       ]
     }

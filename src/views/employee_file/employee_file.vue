@@ -111,7 +111,7 @@
                  :data="employeeList">
         <el-table-column
           type="selection"
-          width="40"
+          width="35"
         ></el-table-column>
         <el-table-column
           prop="empId"
@@ -452,7 +452,7 @@
         //是否在職列表
         isOnjobList: [{ lable: "在職", value: true }, { lable: "離職", value: false }],
         pageNum: 1,
-        pageSize: 50,
+        pageSize: default_page_size,
         total: 0,
         searchDeptId: undefined,
         deptDesc: undefined,
@@ -519,7 +519,7 @@
       async getEmployeeList() {
         //请求参数
         const {
-          pageNum = 1, pageSize = default_page_size, searchDeptId: deptId = 49, deptDesc,
+          pageNum, pageSize, searchDeptId: deptId = 49, deptDesc,
           searchResignReason: resignReason, searchIsOnjob: isOnjob, searchEmpId: empId,
           searchEmpName: empName, searchJoinDate: joinDate, searchLeaveDate: leaveDate
         } = this;

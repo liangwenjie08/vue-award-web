@@ -23,7 +23,9 @@ import {
   Dialog,
   Radio,
   RadioGroup,
-  Tooltip
+  Tooltip,
+  TimeSelect,
+  TimePicker
 } from "element-ui";
 import TableBox from "@/components/TableBox";
 import { message, loading, notification } from "@/utils/utility_class";
@@ -55,6 +57,8 @@ Vue.use(Popover);
 Vue.use(Dialog);
 Vue.use(Tooltip);
 Vue.use(ButtonGroup);
+Vue.use(TimeSelect);
+Vue.use(TimePicker);
 
 Vue.component("treeselect", Treeselect);
 Vue.component("file-upload", FileUpload);

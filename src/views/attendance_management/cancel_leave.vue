@@ -26,30 +26,35 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="60"
-          prop="shift"
-          label="班次"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          min-width="100"
+          min-width="140"
           prop="restStartTime"
-          label="休息日期"
+          label="開始休息"
           align="center"
-          :formatter="restStartTimeFormatter"
         ></el-table-column>
         <el-table-column
-          min-width="100"
-          prop="workStartTime"
-          label="工作日期"
+          min-width="140"
+          prop="restEndTime"
+          label="結束休息"
           align="center"
-          :formatter="workStartTimeFormatter"
         ></el-table-column>
         <el-table-column
-          min-width="80"
+          min-width="60"
           prop="code"
           label="類型"
           align="center"
+        ></el-table-column>
+        <el-table-column
+          min-width="50"
+          prop="restTime"
+          label="小計"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          min-width="200"
+          prop="description"
+          label="事由"
+          align="center"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column
           min-width="100"
@@ -76,33 +81,46 @@
       <div :tabindex="0" @keyup.enter.stop="addAndUpdateAxios" class="form">
         <div class="dialog-cell-item">
           <span class="span-distance">員工編號</span>
-          <el-input ref="adjustHolidayEmpId" @change="empIsExist = false" @keyup.enter.stop.native="getEmployee"
-                    v-model="empId"
-                    placeholder="員工編號"></el-input>
+          <el-input ref="leaveEmpId" @change="empIsExist = false" @keyup.enter.stop.native="getEmployee"
+                    v-model="empId" placeholder="員工編號"></el-input>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">員工姓名</span>
           <el-input readonly v-model="empName" placeholder="員工姓名"></el-input>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">工作日期</span>
-          <el-date-picker v-model="workDate" value-format="yyyy-MM-dd HH:mm:ss"
-                          format="yyyyMMdd" style="width: 100%;" placeholder="工作日期"></el-date-picker>
+          <span class="span-distance">開始休息時間</span>
+          <el-date-picker v-model="startDate" value-format="yyyy-MM-dd"
+                          format="yyyyMMdd" style="width: 100%;" placeholder="日期"></el-date-picker>
+          <el-time-picker style="width: 100%;margin-top: 5px;" arrow-control placeholder="時間" format="HHmm"
+                          value-format="HH:mm:ss" v-model="startTime"></el-time-picker>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">休息日期</span>
-          <el-date-picker v-model="restDate" value-format="yyyy-MM-dd HH:mm:ss"
-                          format="yyyyMMdd" style="width: 100%;" placeholder="休息日期"></el-date-picker>
+          <span class="span-distance">結束休息時間</span>
+          <el-date-picker v-model="endDate" value-format="yyyy-MM-dd"
+                          format="yyyyMMdd" style="width: 100%;" placeholder="日期"></el-date-picker>
+          <el-time-picker style="width: 100%;margin-top: 5px;" arrow-control placeholder="時間" format="HHmm"
+                          value-format="HH:mm:ss" v-model="endTime"></el-time-picker>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">班次</span>
-          <el-input v-model="shift" placeholder="班次"></el-input>
+          <span class="span-distance">小計</span>
+          <el-input v-model="restTime" placeholder="小計"></el-input>
         </div>
         <div class="dialog-cell-item">
-          <el-radio-group v-model="code">
-            <el-radio label="1">正常調休</el-radio>
-            <el-radio label="2">僅休息</el-radio>
-          </el-radio-group>
+          <span class="span-distance">事由</span>
+          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model="description"
+                    placeholder="事由"></el-input>
+        </div>
+        <div class="dialog-cell-item">
+          <span class="span-distance">請假類型</span>
+          <el-select filterable placeholder="請假類型" v-model="code" clearable>
+            <el-option
+              v-for="item of holidayTypeList"
+              :key="item.code"
+              :value="item.code"
+              :label="item.description"
+            ></el-option>
+          </el-select>
         </div>
         <div class="dialog-cell-item">
           <el-button :loading="loading" :disabled="loading" @click="addAndUpdateAxios" type="primary"
@@ -117,10 +135,10 @@
 
 <script>
   import { FORM, EMPLOYEE } from "@/api/attendance_management.js";
-  import { default_page_size } from "@/utils/common_variable";
+  import { default_page_size, holiday_type } from "@/utils/common_variable";
 
   export default {
-    name: "adjust_holiday",
+    name: "cancel_leave",
     props: ["params"],
     data() {
       return {
@@ -132,18 +150,24 @@
         doLayout: true,
         isUpdateOperation: false,
         loading: false,
-        //員工是否存在
         empIsExist: false,
         //添加和更新請求參數
         id: undefined,
         empId: "",
         empName: "",
-        workDate: null,
-        restDate: null,
-        shift: "",
-        //調休類型
-        code: "1"
+        startDate: null,
+        startTime: null,
+        endDate: null,
+        endTime: null,
+        restTime: "",
+        description: "",
+        code: "1011"
       };
+    },
+    computed: {
+      holidayTypeList() {
+        return holiday_type;
+      }
     },
     watch: {
       params: function() {
@@ -164,7 +188,7 @@
           const res = await this.$axios.request({
             url: FORM,
             params: {
-              type: 0,
+              type: 4,
               deptId: searchDeptId,
               empId,
               startDate,
@@ -209,7 +233,10 @@
         }
       },
       async addAndUpdateAxios() {
-        const { empIsExist, empId, workDate, restDate, shift, code, id, $message, isUpdateOperation } = this;
+        const {
+          empIsExist, empId, startDate, startTime, endDate, endTime,
+          restTime, id, description, code, $message, isUpdateOperation
+        } = this;
         if(!empIsExist) {
           $message({
             message: "請先輸入員工!",
@@ -217,16 +244,23 @@
           });
           return;
         }
-        if(!workDate) {
+        if(!startTime || !startDate) {
           $message({
-            message: "工作日期不允許為空!",
+            message: "開始休息時間不允許為空!",
             type: "error"
           });
           return;
         }
-        if(!restDate) {
+        if(!endTime || !endDate) {
           $message({
-            message: "休息日期不允許為空!",
+            message: "結束休息時間不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(!code) {
+          $message({
+            message: "請假類型不允許為空!",
             type: "error"
           });
           return;
@@ -236,6 +270,8 @@
         }
         try {
           this.loading = true;
+          const restStartTime = `${ startDate } ${ startTime }`;
+          const restEndTime = `${ endDate } ${ endTime }`;
           const { request, method } = this.$axios;
           await request({
             url: FORM,
@@ -243,11 +279,12 @@
             data: {
               empId,
               id,
-              restStartTime: restDate,
-              workStartTime: workDate,
-              shift,
+              restStartTime,
+              restEndTime,
+              type: 4,
+              restTime,
               code,
-              type: 0
+              description
             }
           });
           $message({
@@ -256,22 +293,46 @@
           const { getTableData, reset, $refs } = this;
           getTableData();
           reset();
-          $refs.adjustHolidayEmpId.focus();
+          $refs.leaveEmpId.focus();
         } finally {
           this.loading = false;
         }
       },
       reset() {
-        this.empIsExist = false;
         this.isUpdateOperation = false;
+        this.empIsExist = false;
         this.singleSelectedData = null;
         this.id = undefined;
-        this.code = "1";
         this.empId = "";
         this.empName = "";
-        this.restDate = null;
-        this.workDate = null;
-        this.shift = "";
+        this.startDate = null;
+        this.startTime = null;
+        this.endDate = null;
+        this.endTime = null;
+        this.restTime = "";
+        this.description = "";
+      },
+      singleSelectedRow(selectedData) {
+        if(this.singleSelectedData === selectedData) {
+          this.reset();
+        } else {
+          this.isUpdateOperation = true;
+          this.empIsExist = true;
+          this.singleSelectedData = selectedData;
+          this.id = selectedData.id;
+          this.empId = selectedData.empId;
+          this.empName = selectedData.empName;
+          const { restEndTime, restStartTime } = selectedData;
+          this.startDate = restStartTime.split(" ")[0];
+          this.startTime = restStartTime.split(" ")[1];
+          this.endDate = restEndTime.split(" ")[0];
+          this.endTime = restEndTime.split(" ")[1];
+          this.restTime = selectedData.restTime;
+          this.description = selectedData.description;
+        }
+      },
+      multipleSelectedRow(selectedData) {
+        this.$emit("multiple-selected", selectedData);
       },
       sizeChange(size) {
         this.pageSize = size;
@@ -280,31 +341,6 @@
       pageChange(page) {
         this.pageNum = page;
         this.getTableData();
-      },
-      multipleSelectedRow(selectedData) {
-        this.$emit("multiple-selected", selectedData);
-      },
-      singleSelectedRow(selectedData) {
-        if(selectedData === this.singleSelectedData) {
-          this.reset();
-        } else {
-          this.empIsExist = true;
-          this.isUpdateOperation = true;
-          this.singleSelectedData = selectedData;
-          this.id = selectedData.id;
-          this.code = selectedData.code;
-          this.empId = selectedData.empId;
-          this.empName = selectedData.empName;
-          this.restDate = selectedData.restStartTime;
-          this.workDate = selectedData.workStartTime;
-          this.shift = selectedData.shift;
-        }
-      },
-      restStartTimeFormatter(row) {
-        return row.restStartTime.split(" ")[0];
-      },
-      workStartTimeFormatter(row) {
-        return row.workStartTime.split(" ")[0];
       },
       createTimeFormatter(row) {
         return row.createTime.split(" ")[0];
@@ -336,3 +372,4 @@
     }
   }
 </style>
+

@@ -68,7 +68,8 @@
       <div :tabindex="0" @keyup.enter.stop="addAndUpdateAxios" class="form">
         <div class="dialog-cell-item">
           <span class="span-distance">員工編號</span>
-          <el-input @change="empIsExist = false" @keyup.enter.stop.native="getEmployee" v-model="empId"
+          <el-input ref="compensatoryHolidayEmpId" @change="empIsExist = false" @keyup.enter.stop.native="getEmployee"
+                    v-model="empId"
                     placeholder="員工編號"></el-input>
         </div>
         <div class="dialog-cell-item">
@@ -76,23 +77,19 @@
           <el-input readonly v-model="empName" placeholder="員工姓名"></el-input>
         </div>
         <div class="dialog-cell-item">
-          <span class="span-distance">日期</span>
-          <el-date-picker @keyup.enter.stop.native v-model="date" value-format="yyyy-MM-dd HH:mm:ss"
+          <span class="span-distance">加班日期</span>
+          <el-date-picker v-model="date" value-format="yyyy-MM-dd"
                           format="yyyyMMdd" style="width: 100%;" placeholder="工作日期"></el-date-picker>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">時間由</span>
-          <el-time-picker arrow-control placeholder="開始時間" format="HHmm" value-format="HH:mm:ss"
-                          @keyup.enter.stop.native v-model="startTime"></el-time-picker>
-          <!--          <el-time-select @keyup.enter.stop.native v-model="startTime" value-format="HH:mm:ss"-->
-          <!--                          format="HHmmss" style="width: 100%;" placeholder="開始時間"></el-time-select>-->
+          <el-time-picker style="width: 100%;" arrow-control placeholder="開始時間" format="HHmm" value-format="HH:mm:ss"
+                          v-model="startTime"></el-time-picker>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">至</span>
-          <el-time-picker arrow-control placeholder="結束時間" format="HHmm" value-format="HH:mm:ss"
-                          @keyup.enter.stop.native v-model="endTime"></el-time-picker>
-          <!--          <el-time-select @keyup.enter.stop.native v-model="endTime" value-format="HH:mm:ss"-->
-          <!--                          format="HHmm" style="width: 100%;" placeholder="休息日期"></el-time-select>-->
+          <el-time-picker style="width: 100%;" arrow-control placeholder="結束時間" format="HHmm" value-format="HH:mm:ss"
+                          v-model="endTime"></el-time-picker>
         </div>
         <div class="dialog-cell-item">
           <span class="span-distance">小計</span>
@@ -202,7 +199,65 @@
         }
       },
       async addAndUpdateAxios() {
-
+        const { empIsExist, empId, date, startTime, endTime, restTime, id, $message, isUpdateOperation } = this;
+        if(!empIsExist) {
+          $message({
+            message: "請先輸入員工!",
+            type: "error"
+          });
+          return;
+        }
+        if(!date) {
+          $message({
+            message: "休息日期不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(!startTime) {
+          $message({
+            message: "開始休息時間不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(!endTime) {
+          $message({
+            message: "結束休息時間不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(this.loading) {
+          return;
+        }
+        try {
+          this.loading = true;
+          const restStartTime = `${ date } ${ startTime }`;
+          const restEndTime = `${ date } ${ endTime }`;
+          const { request, method } = this.$axios;
+          await request({
+            url: FORM,
+            method: isUpdateOperation ? method.PUT : method.POST,
+            data: {
+              empId,
+              id,
+              restStartTime,
+              restEndTime,
+              type: 2,
+              restTime
+            }
+          });
+          $message({
+            message: isUpdateOperation ? "更新成功" : "新增成功"
+          });
+          const { getTableData, reset, $refs } = this;
+          getTableData();
+          reset();
+          $refs.compensatoryHolidayEmpId.focus();
+        } finally {
+          this.loading = false;
+        }
       },
       reset() {
         this.isUpdateOperation = false;

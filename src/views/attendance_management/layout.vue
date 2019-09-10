@@ -10,11 +10,23 @@
                      style="background-color: #418DCF;">
             補休
           </el-button>
-          <el-button type="primary" style="background-color: #418DCF;">請假</el-button>
-          <el-button type="primary" style="background-color: #418DCF;">加班</el-button>
-          <el-button type="primary" style="background-color: #418DCF;">出差</el-button>
-          <el-button type="primary" style="background-color: #418DCF;">銷假</el-button>
+          <el-button @click="changeActiveComponent('leave')" type="primary" style="background-color: #418DCF;">
+            請假
+          </el-button>
+          <el-button @click="changeActiveComponent('workingOvertime')" type="primary"
+                     style="background-color: #418DCF;">
+            加班
+          </el-button>
+          <el-button @click="changeActiveComponent('businessTrip')" type="primary" style="background-color: #418DCF;">
+            出差
+          </el-button>
+          <el-button @click="changeActiveComponent('cancelLeave')" type="primary" style="background-color: #418DCF;">
+            銷假
+          </el-button>
         </el-button-group>
+        <div class="router-description">
+          {{ routerDescription }}
+        </div>
       </div>
       <div class="header-search">
         <textile-department style="width: 160px;" v-model="searchDeptId"></textile-department>
@@ -40,8 +52,11 @@
 <script>
   import adjust_holiday from "./adjust_holiday.vue";
   import compensatory_holiday from "./compensatory_holiday.vue";
+  import leave from "./leave.vue";
+  import cancel_leave from "./cancel_leave.vue";
+  import working_overtime from "./working_overtime.vue";
+  import business_trip from "./business_trip.vue";
   import { FORM, DOWNLOAD_EXCEL } from "@/api/attendance_management.js";
-
 
   export default {
     name: "layout",
@@ -67,7 +82,11 @@
     },
     components: {
       adjustHoliday: adjust_holiday,
-      compensatoryHoliday: compensatory_holiday
+      compensatoryHoliday: compensatory_holiday,
+      leave,
+      workingOvertime: working_overtime,
+      businessTrip: business_trip,
+      cancelLeave: cancel_leave
     },
     computed: {
       params() {
@@ -93,6 +112,29 @@
       },
       downloadExcelURL() {
         return DOWNLOAD_EXCEL;
+      },
+      routerDescription() {
+        switch(this.activeComponent) {
+          case "adjustHoliday":
+            return "調休";
+          case "compensatoryHoliday":
+            return "補休";
+          case "leave":
+            return "請假";
+          case "workingOvertime":
+            return "加班";
+          case "businessTrip":
+            return "出差";
+          case "cancelLeave":
+            return "銷假";
+        }
+      }
+    },
+    watch: {
+      activeComponent() {
+        this.$nextTick(function() {
+          this.getTableData = this.$refs.childrenComponent.getTableData;
+        });
       }
     },
     mounted() {
@@ -126,6 +168,11 @@
 
       .header-routers {
         padding-bottom: 10px;
+
+        .router-description {
+          float: right;
+          padding-right: 20px;
+        }
       }
 
       .header-search {

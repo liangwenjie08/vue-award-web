@@ -99,6 +99,10 @@ const routers = new Router({
         {
           path: "attendanceManagement/form",
           component: () => import("@/views/attendance_management/layout.vue")
+        },
+        {
+          path: "dept/list",
+          component: () => import("@/views/textile_department_management/department_list.vue")
         }
       ]
     }

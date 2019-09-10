@@ -10,9 +10,9 @@
         更新
       </el-button>
       <delete-button :delete-callback="getPositionList" description-key="posId" id-key="posId"
-                     :selected-data="selectedData" :url="positionURL" />
-      <file-upload :url="importURL" />
-      <file-download :url="downloadTemplateURL" />
+                     :selected-data="selectedData" :url="positionURL"></delete-button>
+      <file-upload :url="importURL"></file-upload>
+      <file-download :url="downloadTemplateURL"></file-download>
     </div>
     <div class="table">
       <table-box @current-change="selectedRow" :data="paginationData" highlight-current-row>
@@ -21,44 +21,44 @@
           prop="posId"
           label="崗位編號"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="110"
           prop="posDesc"
           label="崗位名稱"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="60"
           prop="positionRate"
           label="崗位係數"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="60"
           prop="totalPrizeRate"
           label="總奬金係數"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="60"
           prop="outputPrizeType"
           label="產量獎金類型"
           align="center"
           :formatter="outputPrizeTypeFormatter"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="100"
           prop="topDeptDesc"
           label="上級部門名稱"
           align="center"
-        />
+        ></el-table-column>
         <el-table-column
           min-width="100"
           prop="deptDesc"
           label="所屬部門"
           align="center"
-        />
+        ></el-table-column>
       </table-box>
     </div>
     <el-pagination
@@ -70,7 +70,7 @@
       :page-size="pageSize"
       @size-change="sizeChange"
       @current-change="pageChange"
-    />
+    ></el-pagination>
     <el-dialog width="30%" :title="`${isUpdateOperation ? '更新' : '新增'}崗位信息`" :visible.sync="dialogVisible">
       <div class="dialog-cell-item">
         <span class="span-distance">{{isUpdateOperation ? "所屬" : "上級"}}部門</span>
@@ -105,7 +105,7 @@
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button style="background-color: #418DCF;" type="primary" @click="addAndUpdateAixos">
-          {{this.isUpdateOperation ? "更 新" : "确 定"}}
+          {{isUpdateOperation ? "更 新" : "确 定"}}
         </el-button>
       </div>
     </el-dialog>

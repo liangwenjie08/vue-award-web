@@ -8,6 +8,9 @@
         <el-button @click="addAndUpdateHandler(false, false)" style="background-color: #5CB85C;" type="primary"
                    icon="el-icon-plus">增加
         </el-button>
+        <el-button @click="addAndUpdateHandler(true, false)" style="background-color: #5BC0DE;" type="primary"
+                   icon="el-icon-edit">更新
+        </el-button>
         <el-popover
           @show="deleteConfirmShow"
           @hide="deleteConfirmHide"
@@ -16,12 +19,7 @@
           v-model="deleteConfirmVisible"
           style="margin-left: 10px;margin-right: 10px;">
           <p>
-            确定删除
-            <strong>
-              {{
-              multipleChoiceFlag ? "右側展示的人" : singleSelectedData !== null ? singleSelectedData.empName : ""
-              }}
-            </strong>吗？
+            确定删除<strong>右側展示的人吗？</strong>
           </p>
           <div style="text-align: right; margin: 0">
             <el-button type="text" @click="deleteConfirmVisible = false">取消</el-button>
@@ -33,9 +31,6 @@
           <el-button slot="reference" style="background-color: red;" type="primary" icon="el-icon-delete-solid">刪除
           </el-button>
         </el-popover>
-        <el-button @click="addAndUpdateHandler(true, false)" style="background-color: #5BC0DE;" type="primary"
-                   icon="el-icon-edit">更新
-        </el-button>
         <el-button @click="addAndUpdateHandler(true, true)" style="background-color: #418DCF;" type="primary"
                    icon="el-icon-document">查看明細
         </el-button>
@@ -102,7 +97,6 @@
                           range-separator="至" start-placeholder="離職開始日期" end-placeholder="離職結束日期" style="width: 270px;"
                           :picker-options="datePickerOptions"
           ></el-date-picker>
-          <el-checkbox style="margin-left: 20px;" v-model="multipleChoiceFlag">多選</el-checkbox>
         </div>
       </div>
     </div>
@@ -405,7 +399,8 @@
       </div>
       <div v-if="!isDetail" slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button :disabled="loading" :loading="loading" style="background-color: #418DCF;" type="primary" @click="addAndUpdateEmployee">
+        <el-button :disabled="loading" :loading="loading" style="background-color: #418DCF;" type="primary"
+                   @click="addAndUpdateEmployee">
           {{this.isUpdateOperation ? "更 新" : "确 定"}}
         </el-button>
       </div>
@@ -464,8 +459,6 @@
         searchLeaveDate: [],
         //表格是否需要重新計算寬度
         doLayout: true,
-        //表格是否多選，多選為true
-        multipleChoiceFlag: false,
         //表格單選時的數據
         singleSelectedData: null,
         //表格多選時的數據
@@ -704,20 +697,18 @@
       deleteConfirmShow() {
         const multipleSelectedData = this.multipleSelectedData;
         const len = multipleSelectedData.length;
-        if(this.multipleChoiceFlag && len > 0) {
-          let message = "";
-          for(let i = 0; i < len; i ++) {
-            const item = multipleSelectedData[i];
-            message += item.empName;
-            if(i !== len - 1) {
-              message += " , ";
-            }
+        let message = "";
+        for(let i = 0; i < len; i ++) {
+          const item = multipleSelectedData[i];
+          message += item.empName;
+          if(i !== len - 1) {
+            message += " , ";
           }
-          this.notificationInstance = this.$notification({
-            message,
-            type: "warning"
-          });
         }
+        this.notificationInstance = this.$notification({
+          message,
+          type: "warning"
+        });
       },
       async deleteTableData() {
         if(this.isClick) {
@@ -725,33 +716,19 @@
         }
         this.isClick = true;
         const empIdArr = [];
-        //為true就是多選刪除
-        if(this.multipleChoiceFlag) {
-          const multipleSelectedData = this.multipleSelectedData;
-          const len = multipleSelectedData.length;
-          if(multipleSelectedData.length === 0) {
-            this.$message({
-              message: "請選擇需要刪除的數據!",
-              type: "error"
-            });
-            this.isClick = false;
-            return null;
-          }
-          for(let i = 0; i < len; i ++) {
-            const item = multipleSelectedData[i];
-            empIdArr.push(item.empId);
-          }
-        } else {
-          const singleSelectedData = this.singleSelectedData;
-          if(singleSelectedData === null) {
-            this.$message({
-              message: "請選擇需要刪除的數據!",
-              type: "error"
-            });
-            this.isClick = false;
-            return null;
-          }
-          empIdArr.push(singleSelectedData.empId);
+        const multipleSelectedData = this.multipleSelectedData;
+        const len = multipleSelectedData.length;
+        if(len === 0) {
+          this.$message({
+            message: "請選擇需要刪除的數據!",
+            type: "error"
+          });
+          this.isClick = false;
+          return null;
+        }
+        for(let i = 0; i < len; i ++) {
+          const item = multipleSelectedData[i];
+          empIdArr.push(item.empId);
         }
         try {
           await this.$axios.request({

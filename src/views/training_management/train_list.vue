@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="table">
-      <table-box @selection-change="selectionChange" :data="trainList">
+      <table-box @selection-change="multipleSelectedRow" :data="trainList">
         <el-table-column
           type="selection"
           width="35"
@@ -191,7 +191,16 @@
         </div>
       </div>
       <div style="height: 400px;margin-top: 10px;">
-        <table-box @selection-change="selectionChange" :data="employeeList">
+        <el-table
+          ref="traintableRef"
+          border
+          height="100%"
+          style="width:100%;"
+          tooltip-effect="light"
+          size="mini"
+          @selection-change="trainSelectionChange"
+          :data="employeeList"
+        >
           <el-table-column
             type="selection"
             width="35"
@@ -208,7 +217,7 @@
             label="姓名"
             align="center"
           ></el-table-column>
-        </table-box>
+        </el-table>
       </div>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -473,10 +482,13 @@
         const lenght = employeeList.length;
         for(let i = 0; i < lenght; i ++) {
           const item = employeeList[i];
-          this.$refs.tableBoxRef.toggleRowSelection(item);
+          this.$refs.traintableRef.toggleRowSelection(item);
         }
       },
-      selectionChange(selection) {
+      multipleSelectedRow(selection) {
+        this.multipleSelectedData = selection;
+      },
+      trainSelectionChange(selection) {
         this.selectedEmployeeList = selection;
       },
       sizeChange(size) {

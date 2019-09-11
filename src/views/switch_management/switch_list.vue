@@ -38,7 +38,7 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="45"
+          min-width="50"
           prop="shift"
           label="班制"
           align="center"
@@ -50,7 +50,7 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="45"
+          min-width="50"
           prop="empGroup"
           label="分组"
           align="center"
@@ -76,9 +76,9 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          min-width="70"
+          min-width="50"
           prop="borrowFlag"
-          label="是否外借"
+          label="外借"
           align="center"
           :formatter="borrowFlagFormatter"
         ></el-table-column>

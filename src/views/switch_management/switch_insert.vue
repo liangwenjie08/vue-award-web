@@ -17,7 +17,8 @@
         </el-select>
       </div>
       <div class="header-submit">
-        <el-button :disabled="employeeListIsEmpty" @click="submit" type="primary" icon="el-icon-success"
+        <el-button :loading="submitLoading" :disabled="employeeListIsEmpty || submitLoading || isUpdateOperation" @click="submit"
+                   type="primary" icon="el-icon-success"
                    style="background-color: #418DCF;">
           提 交
         </el-button>
@@ -33,8 +34,8 @@
             align="center"
           >
             <template slot-scope="scope">
-              <i v-if="scope.row.isInput" style="font-size: 18px;" class="el-icon-success"></i>
-              <i v-else style="font-size: 18px;" class="el-icon-error"></i>
+              <i v-if="scope.row.isInput" style="font-size: 18px;color: #5CB85C;" class="el-icon-success"></i>
+              <i v-else style="font-size: 18px;color: red;" class="el-icon-error"></i>
             </template>
           </el-table-column>
           <el-table-column
@@ -62,9 +63,9 @@
             align="center"
           ></el-table-column>
           <el-table-column
-            min-width="70"
+            min-width="50"
             prop="borrowFlag"
-            label="是否外借"
+            label="外借"
             align="center"
             :formatter="borrowFlagFormatter"
           ></el-table-column>
@@ -91,6 +92,7 @@
             prop="machineNo"
             label="機號"
             align="center"
+            show-overflow-tooltip
           ></el-table-column>
           <el-table-column
             min-width="110"
@@ -107,7 +109,7 @@
         </table-box>
       </template>
       <template #form>
-        <div class="form">
+        <div @keyup.enter.stop="clickSaveButton" class="form">
           <div class="dialog-cell-item">
             <span class="span-distance">員工</span>
             <el-input :value="employeeId + '-' + employeeName" readonly clearable placeholder="員工"></el-input>
@@ -126,7 +128,6 @@
                 v-for="item of shiftList"
               ></el-option>
             </el-select>
-            <!--            <el-input v-model="shift" clearable placeholder="班制"></el-input>-->
           </div>
           <div class="dialog-cell-item">
             <span class="span-distance">外借車間</span>
@@ -170,9 +171,10 @@
             <el-checkbox v-model="autoNext">自動跳轉到下一條未録入記録</el-checkbox>
           </div>
           <div class="dialog-cell-item">
-            <el-button :disabled="employeeListIsEmpty" @click="saveEmployeeSwitch" type="primary"
-                       style="background-color: #418DCF;margin-top: 15px;">
-              保存
+            <el-button :loading="updateLoading" :disabled="employeeListIsEmpty || updateLoading"
+                       @click="clickSaveButton"
+                       type="primary" style="background-color: #418DCF;margin-top: 15px;">
+              {{ isUpdateOperation ? "更 新": "保 存" }}
             </el-button>
           </div>
         </div>
@@ -182,7 +184,7 @@
 </template>
 
 <script>
-  import { SWITCH_ENTER, TASK_LIST, SWITCH_INPUT } from "@/api/switch_management.js";
+  import { SWITCH_ENTER, TASK_LIST, SWITCH_INPUT, SWITCH_LIST } from "@/api/switch_management.js";
   import { today } from "@/utils/common_variable";
   import { disabledDate } from "@/utils/utility_class";
 
@@ -197,6 +199,9 @@
         doLayout: true,
         autoNext: true,
         selectedData: null,
+        updateLoading: false,
+        submitLoading: false,
+        isUpdateOperation: false,
         datePickerOptions: {
           disabledDate
         },
@@ -265,14 +270,31 @@
             }
           });
           const length = res.length;
+          let isUpdateOperation = true;
           for(let i = 0; i < length; i ++) {
             const item = res[i];
-            if(item.id) {
+            //本車間的外借人員，是：false，否：true
+            const sameDeptBorrowFlag = !(item.borrowFlag && this.searchDeptId === item.deptId);
+            if(!sameDeptBorrowFlag) {
               item.isInput = true;
             } else {
-              item.false = true;
+              if(item.task) {
+                item.isInput = true;
+                if(item.task === "值機" && item.machineNo.length === 0) {
+                  item.isInput = false;
+                }
+                if(item.task === "帶組" && !item.empGroup) {
+                  item.isInput = false;
+                }
+              } else {
+                item.isInput = false;
+              }
+            }
+            if(!item.id) {
+              isUpdateOperation = false;
             }
           }
+          this.isUpdateOperation = isUpdateOperation && length;
           this.switchEmployeeList = res;
           if(this.doLayout && length > 0) {
             this.$nextTick(function() {
@@ -295,9 +317,8 @@
           this.taskList = [];
         }
       },
-      //保存員工交班
-      saveEmployeeSwitch() {
-        const { $message, selectedData } = this;
+      clickSaveButton() {
+        const { $message, selectedData, isUpdateOperation } = this;
         if(!selectedData) {
           $message({
             message: "請選擇需要保存的數據!",
@@ -305,35 +326,43 @@
           });
           return;
         }
+        isUpdateOperation ? this.updateEmployeeSwitch() : this.saveEmployeeSwitch();
+      },
+      //保存員工交班
+      saveEmployeeSwitch() {
+        const { $message } = this;
         const { switchEmployeeList, employeeId, timeFlag } = this;
         const length = switchEmployeeList.length;
         if(timeFlag) { // 外借
           const borrowingWorkshop = this.borrowingWorkshop;
-          const borrowFormList = this.borrowFormList;
-          const formLen = borrowFormList.length;
           let borrowFlag = true;
           if(!borrowingWorkshop) {
             borrowFlag = false;
           }
+          let switchItem = null;
           for(let i = 0; i < length; i ++) {
             const item = switchEmployeeList[i];
             if(item.employeeId === employeeId) {
               item.borrowingWorkshop = borrowingWorkshop;
               item.borrowFlag = borrowFlag;
               item.isInput = true;
-              let exist = false;
-              for(let j = 0; j < formLen; j ++) {
-                const formItem = borrowFormList[j];
-                if(formItem.employeeId === employeeId) {
-                  borrowFormList[j] = { ...item };
-                  exist = true;
-                }
-              }
-              if(!exist) {
-                borrowFormList.push({ ...item });
-              }
+              switchItem = item;
               break;
             }
+          }
+          const borrowFormList = this.borrowFormList;
+          const formLen = borrowFormList.length;
+          let exist = false;
+          for(let j = 0; j < formLen; j ++) {
+            const formItem = borrowFormList[j];
+            if(formItem.employeeId === employeeId) {
+              borrowFormList[j] = { ...switchItem };
+              exist = true;
+              break;
+            }
+          }
+          if(!exist) {
+            borrowFormList.push({ ...switchItem });
           }
         } else {  // 録入工作內容
           const { shift, helper, machineCount, machineNo, empGroup, task, taskIsGroup, taskIsMachine } = this;
@@ -383,13 +412,9 @@
         if(autoNext) {
           const length = switchEmployeeList.length;
           let nextFlag = false;
-          let next = false;
           for(let i = 0; i < length; i ++) {
             const item = switchEmployeeList[i];
-            if(nextFlag && !(item.borrowFlag && this.searchDeptId === item.deptId)) {
-              next = true;
-            }
-            if(next) {
+            if(nextFlag && !item.isInput) {
               this.$refs.tableBoxRef.setCurrentRow(item);
               this.selectedData = item;
               break;
@@ -401,7 +426,7 @@
         }
       },
       async submit() {
-        //外借即为true
+        //timeFlag：外借時間段即为true
         const { timeFlag, exshiftDate, searchDeptId } = this;
         const params = [];
         if(timeFlag) {
@@ -420,6 +445,9 @@
           const length = switchEmployeeList.length;
           for(let i = 0; i < length; i ++) {
             const item = switchEmployeeList[i];
+            if(typeof item.borrowFlag === "string") {
+              item.borrowFlag = false;
+            }
             if(!item.shift) {
               this.$message({
                 message: item.employeeName + "班制不允許為空!",
@@ -427,21 +455,23 @@
               });
               return;
             }
-            if(!(item.borrowFlag && this.searchDeptId === item.deptId) && !item.task) {
+            //是否是本車間的外借人員，是：false，否：true
+            const sameDeptBorrowFlag = !(item.borrowFlag && this.searchDeptId === item.deptId);
+            if(sameDeptBorrowFlag && !item.task) {
               this.$message({
                 message: item.employeeName + "還未録入工作內容!",
                 type: "error"
               });
               return;
             } else {
-              if(item.task === "值機" && item.machineNo.length === 0) {
+              if(sameDeptBorrowFlag && item.task === "值機" && item.machineNo.length === 0) {
                 this.$message({
                   message: item.employeeName + "值機未録入!",
                   type: "error"
                 });
                 return;
               }
-              if(item.task === "帶組" && !item.empGroup) {
+              if(sameDeptBorrowFlag && item.task === "帶組" && !item.empGroup) {
                 this.$message({
                   message: item.employeeName + "分組未録入!",
                   type: "error"
@@ -456,16 +486,84 @@
             }
           }
         }
-        const { request, method } = this.$axios;
-        await request({
-          url: SWITCH_INPUT,
-          method: method.POST,
-          data: params
-        });
-        this.$message({
-          message: timeFlag ? "外借成功" : "工作內容録入成功"
-        });
-        this.getSwitchEmployeeList();
+        try {
+          if(this.submitLoading) {
+            return;
+          }
+          this.submitLoading = true;
+          const { request, method } = this.$axios;
+          await request({
+            url: SWITCH_INPUT,
+            method: method.POST,
+            data: params
+          });
+          this.$message({
+            message: timeFlag ? "外借成功" : "工作內容録入成功"
+          });
+          this.getSwitchEmployeeList();
+        } finally {
+          this.submitLoading = false;
+        }
+      },
+      async updateEmployeeSwitch() {
+        const {
+          $message, employeeId, shift, helper, machineCount, machineNo,
+          empGroup, task, taskIsGroup, taskIsMachine, exshiftDate, selectedData
+        } = this;
+        this.handleMachineNoOnBlur();
+        if(!task) {
+          $message({
+            message: "工作內容不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(taskIsGroup && !empGroup) {
+          $message({
+            message: "帶組不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        if(taskIsMachine && machineNo.length === 0) {
+          $message({
+            message: "值機不允許為空!",
+            type: "error"
+          });
+          return;
+        }
+        const switchEmployeeList = this.switchEmployeeList;
+        const length = switchEmployeeList.length;
+        let param = {
+          employeeId,
+          shift,
+          helper,
+          machineCount,
+          machineNo,
+          empGroup,
+          task,
+          id: selectedData.id,
+          exshiftDate,
+          borrowFlag: selectedData.borrowFlag || false
+        };
+        try {
+          if(this.updateLoading) {
+            return;
+          }
+          this.updateLoading = true;
+          const { request, method } = this.$axios;
+          await request({
+            url: SWITCH_LIST + "/" + selectedData.id,
+            method: method.PUT,
+            data: param
+          });
+          this.$message({
+            message: "更新成功"
+          });
+          this.getSwitchEmployeeList();
+        } finally {
+          this.updateLoading = false;
+        }
       },
       handleMachineNoOnBlur() {
         let machineNo = this.machineNo.trim();
@@ -490,7 +588,7 @@
         }
       },
       borrowFlagFormatter(row) {
-        return row.borrowFlag ? "是" : "否";
+        return row.borrowFlag ? "是" : "";
       }
     }
   };

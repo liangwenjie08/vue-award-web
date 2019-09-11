@@ -239,7 +239,7 @@
     }
 
     .table {
-      height: calc(100% - 80px);
+      height: calc(100% - 50px);
     }
 
     .dialog-cell-item {
